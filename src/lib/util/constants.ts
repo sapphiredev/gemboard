@@ -13,3 +13,11 @@ export const enum Emojis {
 export const enum BrandingColors {
 	Primary = 0x2563eb
 }
+
+export const enum ErrorIdentifiers {
+	ContextMenuCommandTriggeredOnUserContextMenu = 'contextMenuCommandTriggeredOnUserContextMenu',
+	UserNotFoundInDatabase = 'userNotFoundInDatabase',
+	MessageNotFoundInDatabase = 'messageNotFoundInDatabase',
+	NotInCommandGuildIds = 'notInCommandGuildIds',
+	BannedChannel = 'bannedChannel'
+}

@@ -21,6 +21,13 @@ declare module '@sapphire/pieces' {
 	}
 }
 
+declare module '@sapphire/framework' {
+	interface Preconditions {
+		ValidServer: never;
+		ValidChannel: never;
+	}
+}
+
 declare module '@skyra/env-utilities' {
 	interface Env {
 		CLIENT_ID: string;
