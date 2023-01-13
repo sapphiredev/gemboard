@@ -1,13 +1,13 @@
 import { BrandingColors, ErrorIdentifiers, StarboardChannelId, StarboardThreshold } from '#utils/constants';
-import { getStarEmojiForAmount, getStarPluralizedString } from '#utils/functions/helpers';
+import { getStarEmojiForAmount, getStarPluralizedString, resolveOnErrorCodes } from '#utils/functions/helpers';
 import { ActionRowBuilder, ButtonBuilder, channelMention, EmbedBuilder } from '@discordjs/builders';
 import { container, UserError } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
-import { ButtonStyle, type GuildTextBasedChannel, type MessageContextMenuCommandInteraction } from 'discord.js';
+import { ButtonStyle, RESTJSONErrorCodes, type GuildTextBasedChannel, type MessageContextMenuCommandInteraction } from 'discord.js';
 
 export async function sendMessageToStarboard(interaction: MessageContextMenuCommandInteraction, amountOfStarsForMessage: number) {
 	const content = `${getStarEmojiForAmount(amountOfStarsForMessage)} **${amountOfStarsForMessage}** | ${channelMention(interaction.channelId)}`;
-	const starboardChannel = await interaction.guild?.channels.fetch(StarboardChannelId);
+	const starboardChannel = await resolveOnErrorCodes(interaction.guild!.channels.fetch(StarboardChannelId), RESTJSONErrorCodes.MissingAccess);
 
 	if (!starboardChannel?.isTextBased()) {
 		throw new UserError({
@@ -28,8 +28,15 @@ export async function sendMessageToStarboard(interaction: MessageContextMenuComm
 		return postMessage(interaction, starboardChannel, content, amountOfStarsForMessage);
 	}
 
-	const discordMessage = await starboardChannel.messages.fetch(alreadyPostedMessage.snowflake.toString());
-	await discordMessage.edit({ content });
+	const discordMessage = await resolveOnErrorCodes(
+		starboardChannel.messages.fetch(alreadyPostedMessage.snowflake.toString()),
+		RESTJSONErrorCodes.UnknownMessage,
+		RESTJSONErrorCodes.MissingAccess
+	);
+
+	if (!isNullish(discordMessage)) {
+		await discordMessage.edit({ content });
+	}
 
 	const starEmoji = getStarEmojiForAmount(amountOfStarsForMessage);
 	const starPluralized = getStarPluralizedString(amountOfStarsForMessage);
@@ -40,7 +47,7 @@ export async function sendMessageToStarboard(interaction: MessageContextMenuComm
 }
 
 export async function deleteMessageFromStarboard(interaction: MessageContextMenuCommandInteraction, amountOfStarsForMessage: number) {
-	const starboardChannel = await interaction.guild?.channels.fetch(StarboardChannelId);
+	const starboardChannel = await resolveOnErrorCodes(interaction.guild!.channels.fetch(StarboardChannelId), RESTJSONErrorCodes.MissingAccess);
 
 	if (!starboardChannel?.isTextBased()) {
 		throw new UserError({
@@ -78,8 +85,15 @@ export async function deleteMessageFromStarboard(interaction: MessageContextMenu
 		}
 	});
 
-	const discordMessage = await starboardChannel.messages.fetch(deletedStarboardMessageEntry.snowflake.toString());
-	await discordMessage.delete();
+	const discordMessage = await resolveOnErrorCodes(
+		starboardChannel.messages.fetch(deletedStarboardMessageEntry.snowflake.toString()),
+		RESTJSONErrorCodes.UnknownMessage,
+		RESTJSONErrorCodes.MissingAccess
+	);
+
+	if (!isNullish(discordMessage)) {
+		await discordMessage.delete();
+	}
 
 	return interaction.reply({
 		content: `Successfully removed your star.\nThis dropped the message below the threshold of ${StarboardThreshold} so I have deleted the message from the starboard.`,
