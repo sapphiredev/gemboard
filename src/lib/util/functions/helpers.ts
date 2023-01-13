@@ -8,3 +8,7 @@ export function getStarEmojiForAmount(amountOfStarsForMessage: number): string {
 
 	return Emojis.Minior;
 }
+
+export function getStarPluralizedString(amountOfStarsForMessage: number) {
+	return amountOfStarsForMessage === 1 ? 'star' : 'stars';
+}

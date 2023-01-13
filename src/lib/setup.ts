@@ -23,6 +23,7 @@ declare module '@sapphire/pieces' {
 
 declare module '@sapphire/framework' {
 	interface Preconditions {
+		IsMessageContextMenuCommand: never;
 		ValidServer: never;
 		ValidChannel: never;
 	}

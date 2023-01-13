@@ -8,8 +8,9 @@ datasource db {
 }
 
 model Message {
-    snowflake   BigInt        @id
-    UserMessage UserMessage[]
+    snowflake             BigInt                  @id
+    UserMessage           UserMessage[]
+    StarboardBoardMessage StarboardBoardMessage[]
 }
 
 model User {
@@ -18,9 +19,9 @@ model User {
 }
 
 model UserMessage {
-    user      User    @relation(fields: [userId], references: [snowflake])
+    user      User    @relation(fields: [userId], references: [snowflake], onDelete: Cascade)
     userId    BigInt
-    message   Message @relation(fields: [messageId], references: [snowflake])
+    message   Message @relation(fields: [messageId], references: [snowflake], onDelete: Cascade)
     messageId BigInt
 
     @@id([userId, messageId])
@@ -30,6 +31,8 @@ model StarboardBoardMessage {
     snowflake BigInt
     channelId BigInt
     guildId   BigInt
+    message   Message @relation(fields: [messageId], references: [snowflake], onDelete: Cascade)
+    messageId BigInt
 
-    @@id([snowflake, channelId, guildId])
+    @@id([snowflake, channelId, guildId, messageId])
 }

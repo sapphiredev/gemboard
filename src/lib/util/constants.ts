@@ -17,13 +17,13 @@ export const enum BrandingColors {
 }
 
 export const enum ErrorIdentifiers {
-	ContextMenuCommandTriggeredOnUserContextMenu = 'contextMenuCommandTriggeredOnUserContextMenu',
 	UserNotFoundInDatabase = 'userNotFoundInDatabase',
 	MessageNotFoundInDatabase = 'messageNotFoundInDatabase',
 	NotInCommandGuildIds = 'notInCommandGuildIds',
 	BannedChannel = 'bannedChannel',
 	StarboardChannelNotFound = 'starboardChannelNotFound',
-	UserAlreadyStarredMessage = 'userAlreadyStarredMessage'
+	UserAlreadyStarredMessage = 'userAlreadyStarredMessage',
+	StarboardMessageNotFoundInDatabase = 'starboardMessageNotFoundInDatabase'
 }
 
 export const StarboardChannelId = envParseString('NODE_ENV') === 'development' ? '1063577068127916073' : '750076466099912804';
