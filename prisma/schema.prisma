@@ -8,12 +8,12 @@ datasource db {
 }
 
 model Message {
-    snowflake   BigInt        @id @unique
+    snowflake   BigInt        @id
     UserMessage UserMessage[]
 }
 
 model User {
-    snowflake   BigInt        @id @unique
+    snowflake   BigInt        @id
     UserMessage UserMessage[]
 }
 
@@ -24,4 +24,12 @@ model UserMessage {
     messageId BigInt
 
     @@id([userId, messageId])
+}
+
+model StarboardBoardMessage {
+    snowflake BigInt
+    channelId BigInt
+    guildId   BigInt
+
+    @@id([snowflake, channelId, guildId])
 }

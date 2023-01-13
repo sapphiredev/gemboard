@@ -1,9 +1,11 @@
+import { StarboardChannelId } from '#utils/constants';
 import { Precondition } from '@sapphire/framework';
 import type { BaseInteraction, ChatInputCommandInteraction, ContextMenuCommandInteraction } from 'discord.js';
 
 export class UserPrecondition extends Precondition {
 	#bannedChannels = new Set([
 		// Sapphire
+		StarboardChannelId, // ⭐ Starboard
 		'737142021084413973', // Welcome!
 		'917524171150471178', // Get-A-Role!
 		'737142071319855105', // Announcements
@@ -15,7 +17,6 @@ export class UserPrecondition extends Precondition {
 		'868830230503100426', // #!/mod/bot-commands
 		'911641690547302487', // Welcome New Members
 		'737452979162054717', // #!bot-commands
-		'750076466099912804', // ⭐ Starboard
 		'792132881903386664', // Mature Chat
 		'768153232136077334', // Controversial
 		'1049447386491138160', // raid-barrier
