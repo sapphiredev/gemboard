@@ -11,7 +11,6 @@ import {
 } from '@sapphire/framework';
 import { codeBlock } from '@sapphire/utilities';
 import {
-	BaseInteraction,
 	bold,
 	DiscordAPIError,
 	hideLinkEmbed,
@@ -20,6 +19,7 @@ import {
 	RESTJSONErrorCodes,
 	userMention,
 	type APIMessage,
+	type BaseInteraction,
 	type CommandInteraction,
 	type Message
 } from 'discord.js';

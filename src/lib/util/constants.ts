@@ -1,10 +1,7 @@
-import { envParseString } from '@skyra/env-utilities';
 import { URL } from 'node:url';
 
 export const rootFolder = new URL('../../../', import.meta.url);
 export const srcFolder = new URL('src/', rootFolder);
-
-export const ZeroWidthSpace = '\u200B';
 
 export const enum Emojis {
 	GreenTick = '<:greenTick:832292523418189908>',
@@ -19,12 +16,9 @@ export const enum BrandingColors {
 export const enum ErrorIdentifiers {
 	UserNotFoundInDatabase = 'userNotFoundInDatabase',
 	MessageNotFoundInDatabase = 'messageNotFoundInDatabase',
-	NotInCommandGuildIds = 'notInCommandGuildIds',
-	BannedChannel = 'bannedChannel',
 	StarboardChannelNotFound = 'starboardChannelNotFound',
-	UserAlreadyStarredMessage = 'userAlreadyStarredMessage',
-	StarboardMessageNotFoundInDatabase = 'starboardMessageNotFoundInDatabase'
+	UserAlreadyStarredMessage = 'userAlreadyStarredMessage'
 }
 
-export const StarboardChannelId = envParseString('NODE_ENV') === 'development' ? '1063577068127916073' : '750076466099912804';
-export const StarboardThreshold = envParseString('NODE_ENV') === 'development' ? 2 : 3;
+export const StarboardChannelId = process.env.NODE_ENV === 'development' ? '1063577068127916073' : '750076466099912804';
+export const StarboardThreshold = process.env.NODE_ENV === 'development' ? 2 : 3;

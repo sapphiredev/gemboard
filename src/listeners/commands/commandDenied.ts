@@ -1,6 +1,6 @@
 import { handleChatInputOrContextMenuCommandDenied } from '#utils/functions/deniedHelper';
 import { ApplyOptions } from '@sapphire/decorators';
-import { ContextMenuCommandDeniedPayload, Events, Listener, UserError, type ChatInputCommandDeniedPayload } from '@sapphire/framework';
+import { Events, Listener, type ChatInputCommandDeniedPayload, type ContextMenuCommandDeniedPayload, type UserError } from '@sapphire/framework';
 
 @ApplyOptions<Listener.Options>({
 	event: Events.ContextMenuCommandDenied

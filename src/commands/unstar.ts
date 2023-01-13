@@ -4,7 +4,7 @@ import { getGuildIds } from '#utils/utils';
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command, UserError } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
-import { ApplicationCommandType, MessageContextMenuCommandInteraction } from 'discord.js';
+import { ApplicationCommandType, type MessageContextMenuCommandInteraction } from 'discord.js';
 
 @ApplyOptions<Command.Options>({
 	preconditions: ['IsMessageContextMenuCommand', 'ValidServer', 'ValidChannel']

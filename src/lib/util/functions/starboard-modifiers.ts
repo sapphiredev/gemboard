@@ -3,7 +3,7 @@ import { getStarEmojiForAmount, getStarPluralizedString } from '#utils/functions
 import { ActionRowBuilder, ButtonBuilder, channelMention, EmbedBuilder } from '@discordjs/builders';
 import { container, UserError } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
-import { ButtonStyle, GuildTextBasedChannel, MessageContextMenuCommandInteraction } from 'discord.js';
+import { ButtonStyle, type GuildTextBasedChannel, type MessageContextMenuCommandInteraction } from 'discord.js';
 
 export async function sendMessageToStarboard(interaction: MessageContextMenuCommandInteraction, amountOfStarsForMessage: number) {
 	const content = `${getStarEmojiForAmount(amountOfStarsForMessage)} **${amountOfStarsForMessage}** | ${channelMention(interaction.channelId)}`;
