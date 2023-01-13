@@ -1,0 +1,47 @@
+version: '3.9'
+
+services:
+  postgres:
+    container_name: postgres
+    image: 'postgres:15-alpine'
+    networks:
+      - infi
+    restart: always
+    volumes:
+      - 'postgres-data:/var/lib/postgresql/data'
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_DB: 'postgres'
+    logging:
+      options:
+        max-size: "20m"
+        max-file: "3"
+
+  gemboard:
+    build:
+      context: ../
+    container_name: gemboard
+    depends_on:
+      - postgres
+    env_file:
+      - ../src/.env
+      - ../src/.env.development.local
+    image: gemboard:latest
+    logging:
+      options:
+        max-size: '1g'
+        max-file: '3'
+    networks:
+      - infi
+    restart: always
+    tty: true
+
+volumes:
+  postgres-data:
+    external: true
+
+networks:
+  infi:

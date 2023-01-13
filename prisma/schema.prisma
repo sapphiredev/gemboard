@@ -1,0 +1,27 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Message {
+    snowflake   BigInt        @id @unique
+    UserMessage UserMessage[]
+}
+
+model User {
+    snowflake   BigInt        @id @unique
+    UserMessage UserMessage[]
+}
+
+model UserMessage {
+    user      User    @relation(fields: [userId], references: [snowflake])
+    userId    BigInt
+    message   Message @relation(fields: [messageId], references: [snowflake])
+    messageId BigInt
+
+    @@id([userId, messageId])
+}
