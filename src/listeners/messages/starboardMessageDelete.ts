@@ -13,7 +13,7 @@ export class UserListener extends Listener<typeof Events.MessageDelete> {
 		if (message.guildId === envParseString('COMMAND_GUILD_ID')) return;
 		if (message.channelId !== StarboardChannelId) return;
 
-		const starboardMessage = await this.container.prisma.starboardBoardMessage.findFirst({
+		const starboardMessage = await this.container.prisma.starboardMessage.findFirst({
 			where: {
 				snowflake: BigInt(message.id)
 			}
@@ -21,9 +21,9 @@ export class UserListener extends Listener<typeof Events.MessageDelete> {
 
 		if (isNullish(starboardMessage)) return;
 
-		await this.container.prisma.starboardBoardMessage.delete({
+		await this.container.prisma.starboardMessage.delete({
 			where: {
-				snowflake_channelId_guildId_messageId: starboardMessage
+				snowflake_authorId_channelId_guildId_messageId: starboardMessage
 			}
 		});
 	}

@@ -14,19 +14,20 @@ export class UserListener extends Listener<typeof Events.MessageDelete> {
 		if (message.guildId === envParseString('COMMAND_GUILD_ID')) return;
 		if (bannedChannels.has(message.channelId)) return;
 
-		const starboardMessage = await this.container.prisma.starboardBoardMessage.findFirst({
+		const starboardMessage = await this.container.prisma.starboardMessage.findFirst({
 			where: {
 				channelId: BigInt(message.channelId),
 				guildId: BigInt(message.guildId!),
-				messageId: BigInt(message.id)
+				messageId: BigInt(message.id),
+				authorId: BigInt(message.author.id)
 			}
 		});
 
 		if (isNullish(starboardMessage)) return;
 
-		const deletedStarboardMessageEntry = await this.container.prisma.starboardBoardMessage.delete({
+		const deletedStarboardMessageEntry = await this.container.prisma.starboardMessage.delete({
 			where: {
-				snowflake_channelId_guildId_messageId: starboardMessage
+				snowflake_authorId_channelId_guildId_messageId: starboardMessage
 			}
 		});
 

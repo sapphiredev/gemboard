@@ -8,31 +8,38 @@ datasource db {
 }
 
 model Message {
-    snowflake             BigInt                  @id
-    UserMessage           UserMessage[]
-    StarboardBoardMessage StarboardBoardMessage[]
+    snowflake        BigInt             @id
+    UserMessage      UserMessage[]
+    StarboardMessage StarboardMessage[]
+
+    @@map("message")
 }
 
 model User {
     snowflake   BigInt        @id
     UserMessage UserMessage[]
+
+    @@map("user")
 }
 
 model UserMessage {
     user      User    @relation(fields: [userId], references: [snowflake], onDelete: Cascade)
-    userId    BigInt
+    userId    BigInt  @map("user_id")
     message   Message @relation(fields: [messageId], references: [snowflake], onDelete: Cascade)
-    messageId BigInt
+    messageId BigInt  @map("message_id")
 
     @@id([userId, messageId])
+    @@map("user_message")
 }
 
-model StarboardBoardMessage {
+model StarboardMessage {
     snowflake BigInt
-    channelId BigInt
-    guildId   BigInt
+    authorId  BigInt  @map("author_id")
+    channelId BigInt  @map("channel_id")
+    guildId   BigInt  @map("guild_id")
     message   Message @relation(fields: [messageId], references: [snowflake], onDelete: Cascade)
-    messageId BigInt
+    messageId BigInt  @map("message_id")
 
-    @@id([snowflake, channelId, guildId, messageId])
+    @@id([snowflake, authorId, channelId, guildId, messageId])
+    @@map("starboard_message")
 }

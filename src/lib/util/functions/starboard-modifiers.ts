@@ -16,11 +16,12 @@ export async function sendMessageToStarboard(interaction: MessageContextMenuComm
 		});
 	}
 
-	const alreadyPostedMessage = await container.prisma.starboardBoardMessage.findFirst({
+	const alreadyPostedMessage = await container.prisma.starboardMessage.findFirst({
 		where: {
 			channelId: BigInt(interaction.channelId),
 			guildId: BigInt(interaction.guildId!),
-			messageId: BigInt(interaction.targetId!)
+			messageId: BigInt(interaction.targetId!),
+			authorId: BigInt(interaction.targetMessage.author.id)
 		}
 	});
 
@@ -56,11 +57,12 @@ export async function deleteMessageFromStarboard(interaction: MessageContextMenu
 		});
 	}
 
-	const alreadyPostedMessage = await container.prisma.starboardBoardMessage.findFirst({
+	const alreadyPostedMessage = await container.prisma.starboardMessage.findFirst({
 		where: {
 			channelId: BigInt(interaction.channelId),
 			guildId: BigInt(interaction.guildId!),
-			messageId: BigInt(interaction.targetId!)
+			messageId: BigInt(interaction.targetId!),
+			authorId: BigInt(interaction.targetMessage.author.id)
 		}
 	});
 
@@ -74,12 +76,13 @@ export async function deleteMessageFromStarboard(interaction: MessageContextMenu
 		});
 	}
 
-	const deletedStarboardMessageEntry = await container.prisma.starboardBoardMessage.delete({
+	const deletedStarboardMessageEntry = await container.prisma.starboardMessage.delete({
 		where: {
-			snowflake_channelId_guildId_messageId: {
+			snowflake_authorId_channelId_guildId_messageId: {
 				channelId: BigInt(interaction.channelId),
 				guildId: BigInt(interaction.guildId!),
 				snowflake: alreadyPostedMessage.snowflake,
+				authorId: alreadyPostedMessage.authorId,
 				messageId: BigInt(interaction.targetId!)
 			}
 		}
@@ -113,11 +116,12 @@ async function postMessage(
 		components: [buildLinkButtons(interaction)]
 	});
 
-	await container.prisma.starboardBoardMessage.create({
+	await container.prisma.starboardMessage.create({
 		data: {
 			channelId: BigInt(interaction.channelId),
 			guildId: BigInt(interaction.guildId!),
 			snowflake: BigInt(messageOnStarboard.id),
+			authorId: BigInt(interaction.targetMessage.author.id),
 			messageId: BigInt(interaction.targetId!)
 		}
 	});
