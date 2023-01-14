@@ -12,7 +12,7 @@ export class UserPrecondition extends Precondition {
 	}
 
 	private doServerCheck(interaction: BaseInteraction) {
-		if (!interaction.guildId || !envParseString('COMMAND_GUILD_IDS').includes(interaction.guildId)) {
+		if (!interaction.guildId || envParseString('COMMAND_GUILD_ID') !== interaction.guildId) {
 			return this.error({
 				message: 'This command can only be used in registered servers.'
 			});

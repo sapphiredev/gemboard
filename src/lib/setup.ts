@@ -4,7 +4,6 @@ import '@sapphire/plugin-logger/register';
 
 import { PrismaClient } from '@prisma/client';
 import { ApplicationCommandRegistries, container, RegisterBehavior } from '@sapphire/framework';
-import type { ArrayString } from '@skyra/env-utilities';
 import * as colorette from 'colorette';
 import { inspect } from 'util';
 
@@ -37,7 +36,7 @@ declare module '@skyra/env-utilities' {
 		CLIENT_PRESENCE_NAME: string;
 		CLIENT_PRESENCE_TYPE: string;
 
-		COMMAND_GUILD_IDS: ArrayString;
+		COMMAND_GUILD_ID: string;
 
 		DISCORD_TOKEN: string;
 

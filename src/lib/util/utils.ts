@@ -1,5 +1,6 @@
-import { envParseArray } from '@skyra/env-utilities';
+import { envParseString } from '@skyra/env-utilities';
 
 export function getGuildIds(): string[] {
-	return envParseArray('COMMAND_GUILD_IDS', []);
+	const envGuildId = envParseString('COMMAND_GUILD_ID');
+	return envGuildId ? [envGuildId] : [];
 }
