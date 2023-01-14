@@ -14,9 +14,6 @@
 
 ---
 
-**TODO List**
-- [ ] Write Leaderboard command
-
 ## About
 
 Gemboard is a private starboard bot for Sapphire. We love starboard functionality but we've found any public bots lacking. They always have one issue or another, so we decided to make our own.
