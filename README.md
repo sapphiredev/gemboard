@@ -16,7 +16,6 @@
 
 **TODO List**
 - [ ] Write Leaderboard command
-- [ ] messageDelete listener to delete starboard messages
 
 ## About
 
