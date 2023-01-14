@@ -18,6 +18,7 @@
 - [ ] Write Leaderboard command
 - [ ] Implement message references
 - [ ] Verify attachments work
+- [ ] messageDelete listener to delete starboard messages
 
 ## About
 
