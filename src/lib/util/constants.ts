@@ -10,7 +10,8 @@ export const enum Emojis {
 }
 
 export const enum BrandingColors {
-	Primary = 0x2563eb
+	Primary = 0x2563eb,
+	ReferencedMessage = 0x303136
 }
 
 export const enum ErrorIdentifiers {

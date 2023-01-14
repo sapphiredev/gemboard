@@ -107,11 +107,9 @@ async function postMessage(
 	content: string,
 	amountOfStarsForMessage: number
 ) {
-	const embedOfStarredMessage = buildEmbed(interaction.targetMessage);
-
 	const messageOnStarboard = await starboardChannel.send({
 		content,
-		embeds: [embedOfStarredMessage],
+		embeds: await buildEmbeds(interaction),
 		components: [buildLinkButtons(interaction)]
 	});
 
@@ -132,16 +130,29 @@ async function postMessage(
 	});
 }
 
-function buildEmbed(message: MessageContextMenuCommandInteraction['targetMessage']) {
+async function buildEmbeds(interaction: MessageContextMenuCommandInteraction) {
+	const embedOfStarredMessage = buildEmbed(interaction.targetMessage);
+
+	const embeds: EmbedBuilder[] = [embedOfStarredMessage];
+
+	await addReferencedEmbedToEmbeds(interaction.targetMessage, embeds);
+
+	return embeds;
+}
+
+function buildEmbed(message: MessageContextMenuCommandInteraction['targetMessage'], isReferencedMessage = false) {
+	const authorName = isReferencedMessage ? `Replying to ${message.author.tag}` : message.author.tag;
+
 	const embed = new EmbedBuilder()
 		.setAuthor({
-			name: message.author.tag,
-			iconURL: message.author.displayAvatarURL()
+			name: authorName,
+			iconURL: message.author.displayAvatarURL(),
+			url: getMessageUrl(message, isReferencedMessage)
 		})
 		.setDescription(message.content)
-		.setFooter({ text: `Message ID: ${message.id}` })
 		.setTimestamp(message.createdAt)
-		.setColor(BrandingColors.Primary);
+		.setFooter({ text: `Message ID: ${message.id}` })
+		.setColor(isReferencedMessage ? BrandingColors.ReferencedMessage : BrandingColors.Primary);
 
 	if (message.attachments.size) {
 		const firstAttachmentUrl = getImageUrl(message.attachments.first()?.url);
@@ -164,30 +175,52 @@ function buildEmbed(message: MessageContextMenuCommandInteraction['targetMessage
 	return embed;
 }
 
+async function addReferencedEmbedToEmbeds(message: MessageContextMenuCommandInteraction['targetMessage'], embeds: EmbedBuilder[]) {
+	if (embeds.length <= 10 && message.reference && message.reference.messageId && message.reference.guildId) {
+		const referencedGuild = await container.client.guilds.fetch(message.reference.guildId);
+		const referencedChannel = await referencedGuild.channels.fetch(message.reference.channelId);
+
+		if (referencedChannel?.isTextBased()) {
+			const referencedMessage = await referencedChannel.messages.fetch(message.reference.messageId);
+
+			const embedOfReferencedMessage = buildEmbed(referencedMessage, true);
+			embeds.unshift(embedOfReferencedMessage);
+
+			if (referencedMessage.reference) {
+				await addReferencedEmbedToEmbeds(referencedMessage, embeds);
+			}
+		}
+	}
+}
+
 function buildLinkButtons(interaction: MessageContextMenuCommandInteraction) {
 	const actionRow = new ActionRowBuilder<ButtonBuilder>();
 
 	const originalMessageButton = new ButtonBuilder() //
 		.setLabel('Original Message')
-		.setURL(interaction.targetMessage.url)
+		.setURL(getMessageUrl(interaction.targetMessage))
 		.setStyle(ButtonStyle.Link);
 
 	actionRow.addComponents(originalMessageButton);
 
 	if (interaction.targetMessage.reference && interaction.targetMessage.reference.messageId && interaction.targetMessage.reference.guildId) {
-		const referencedMessageUrl = messageLink(
-			interaction.targetMessage.reference.channelId,
-			interaction.targetMessage.reference.messageId,
-			interaction.targetMessage.reference.guildId
-		);
-
 		const referencedMessageButton = new ButtonBuilder() //
-			.setLabel('Referenced Message')
-			.setURL(referencedMessageUrl)
+			.setLabel('First Referenced Message')
+			.setURL(getMessageUrl(interaction.targetMessage, true))
 			.setStyle(ButtonStyle.Link);
 
 		actionRow.addComponents(referencedMessageButton);
 	}
 
 	return actionRow;
+}
+
+function getMessageUrl(message: MessageContextMenuCommandInteraction['targetMessage'], isReferencedMessage = false) {
+	if (isReferencedMessage) {
+		if (message.reference && message.reference.messageId && message.reference.guildId) {
+			return messageLink(message.reference.channelId, message.reference.messageId, message.reference.guildId);
+		}
+	}
+
+	return message.url;
 }
