@@ -17,7 +17,8 @@ export const enum ErrorIdentifiers {
 	UserNotFoundInDatabase = 'userNotFoundInDatabase',
 	MessageNotFoundInDatabase = 'messageNotFoundInDatabase',
 	StarboardChannelNotFound = 'starboardChannelNotFound',
-	UserAlreadyStarredMessage = 'userAlreadyStarredMessage'
+	UserAlreadyStarredMessage = 'userAlreadyStarredMessage',
+	UserHasNotStarredMessage = 'userHasNotStarredMessage'
 }
 
 export const StarboardChannelId = process.env.NODE_ENV === 'development' ? '1063577068127916073' : '750076466099912804';

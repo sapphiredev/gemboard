@@ -43,6 +43,20 @@ export class SlashCommand extends Command {
 			});
 		}
 
+		const userHasStarredMessage = await this.container.prisma.userMessage.findFirst({
+			where: {
+				userId: userWhoUnStarred,
+				messageId: messageToUnStar
+			}
+		});
+
+		if (isNullish(userHasStarredMessage)) {
+			throw new UserError({
+				identifier: ErrorIdentifiers.UserHasNotStarredMessage,
+				message: 'You have not yet starred that message, why not do so now?'
+			});
+		}
+
 		await this.container.prisma.userMessage.delete({
 			where: {
 				userId_messageId: {
