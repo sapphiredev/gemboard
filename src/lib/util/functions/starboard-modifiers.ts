@@ -1,5 +1,5 @@
 import { BrandingColors, ErrorIdentifiers, StarboardChannelId, StarboardThreshold } from '#utils/constants';
-import { getStarEmojiForAmount, getStarPluralizedString, resolveOnErrorCodes } from '#utils/functions/helpers';
+import { getImageUrl, getStarEmojiForAmount, getStarPluralizedString, resolveOnErrorCodes } from '#utils/functions/helpers';
 import { ActionRowBuilder, ButtonBuilder, channelMention, EmbedBuilder } from '@discordjs/builders';
 import { container, UserError } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
@@ -144,7 +144,11 @@ function buildEmbed(message: MessageContextMenuCommandInteraction['targetMessage
 		.setColor(BrandingColors.Primary);
 
 	if (message.attachments.size) {
-		embed.setImage(message.attachments.first()!.url);
+		const firstAttachmentUrl = getImageUrl(message.attachments.first()?.url);
+
+		if (firstAttachmentUrl) {
+			embed.setImage(firstAttachmentUrl);
+		}
 	}
 
 	return embed;

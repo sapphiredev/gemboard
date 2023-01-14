@@ -18,7 +18,6 @@
 - [ ] Write Leaderboard command
 - [ ] Implement message references
 - [ ] Verify attachments work
-- [ ] Verify attachments are images before using them for setImage
 
 ## About
 
