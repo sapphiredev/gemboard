@@ -1,5 +1,5 @@
 import { BrandingColors, ErrorIdentifiers, StarboardChannelId, StarboardThreshold } from '#utils/constants';
-import { getImageUrl, getStarEmojiForAmount, getStarPluralizedString, resolveOnErrorCodes } from '#utils/functions/helpers';
+import { extractImageUrl, getImageUrl, getStarEmojiForAmount, getStarPluralizedString, resolveOnErrorCodes } from '#utils/functions/helpers';
 import { ActionRowBuilder, ButtonBuilder, channelMention, EmbedBuilder } from '@discordjs/builders';
 import { container, UserError } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
@@ -148,6 +148,16 @@ function buildEmbed(message: MessageContextMenuCommandInteraction['targetMessage
 
 		if (firstAttachmentUrl) {
 			embed.setImage(firstAttachmentUrl);
+		}
+	}
+
+	// If no image was found through attachment then check the content of the message
+	if (!embed.data.image?.url) {
+		const extractionResult = extractImageUrl(message.cleanContent);
+
+		if (extractionResult && extractionResult.imageUrl) {
+			embed.setImage(extractionResult.imageUrl);
+			embed.setDescription(extractionResult.contentWithoutImageUrl || null);
 		}
 	}
 

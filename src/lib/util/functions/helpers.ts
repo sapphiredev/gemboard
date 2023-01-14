@@ -35,3 +35,19 @@ export function getImageUrl(url: string | undefined): string | undefined {
 	const parsed = tryParseURL(url);
 	return parsed && IMAGE_EXTENSION.test(parsed.pathname) ? parsed.href : undefined;
 }
+
+const ImageUrlExtractionRegex = /(?<url>http(?:s)?:?(?:\/\/[^"' ]*\.(bmp|jpe?g|png|gif|webp)))/gi;
+export function extractImageUrl(content: string): ExtractImageUrl | undefined {
+	const match = ImageUrlExtractionRegex.exec(content)?.groups?.url;
+
+	if (!match) return undefined;
+	return {
+		imageUrl: getImageUrl(match),
+		contentWithoutImageUrl: content.replace(new RegExp(`${match} ?`), '')
+	};
+}
+
+interface ExtractImageUrl {
+	imageUrl: string | undefined;
+	contentWithoutImageUrl: string;
+}
