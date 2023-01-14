@@ -16,7 +16,7 @@
 
 **TODO List**
 - [ ] Write Leaderboard command
-- [ ] Implement message references
+- [ ] Implement no self starring
 - [ ] messageDelete listener to delete starboard messages
 
 ## About

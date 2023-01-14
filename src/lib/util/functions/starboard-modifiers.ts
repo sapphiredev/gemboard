@@ -1,6 +1,6 @@
 import { BrandingColors, ErrorIdentifiers, StarboardChannelId, StarboardThreshold } from '#utils/constants';
 import { extractImageUrl, getImageUrl, getStarEmojiForAmount, getStarPluralizedString, resolveOnErrorCodes } from '#utils/functions/helpers';
-import { ActionRowBuilder, ButtonBuilder, channelMention, EmbedBuilder } from '@discordjs/builders';
+import { ActionRowBuilder, ButtonBuilder, channelMention, EmbedBuilder, messageLink } from '@discordjs/builders';
 import { container, UserError } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
 import { ButtonStyle, RESTJSONErrorCodes, type GuildTextBasedChannel, type MessageContextMenuCommandInteraction } from 'discord.js';
@@ -172,7 +172,22 @@ function buildLinkButtons(interaction: MessageContextMenuCommandInteraction) {
 		.setURL(interaction.targetMessage.url)
 		.setStyle(ButtonStyle.Link);
 
-	actionRow.setComponents([originalMessageButton]);
+	actionRow.addComponents(originalMessageButton);
+
+	if (interaction.targetMessage.reference && interaction.targetMessage.reference.messageId && interaction.targetMessage.reference.guildId) {
+		const referencedMessageUrl = messageLink(
+			interaction.targetMessage.reference.channelId,
+			interaction.targetMessage.reference.messageId,
+			interaction.targetMessage.reference.guildId
+		);
+
+		const referencedMessageButton = new ButtonBuilder() //
+			.setLabel('Referenced Message')
+			.setURL(referencedMessageUrl)
+			.setStyle(ButtonStyle.Link);
+
+		actionRow.addComponents(referencedMessageButton);
+	}
 
 	return actionRow;
 }
