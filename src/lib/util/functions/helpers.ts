@@ -1,6 +1,5 @@
-import { Emojis } from '#utils/constants';
 import { tryParseURL } from '@sapphire/utilities';
-import { DiscordAPIError, RESTJSONErrorCodes } from 'discord.js';
+import { DiscordAPIError, formatEmoji, RESTJSONErrorCodes } from 'discord.js';
 
 export function getStarEmojiForAmount(amountOfStarsForMessage: number): string {
 	if (amountOfStarsForMessage <= 10) return '⭐';
@@ -8,7 +7,7 @@ export function getStarEmojiForAmount(amountOfStarsForMessage: number): string {
 	if (amountOfStarsForMessage <= 30) return '✨';
 	if (amountOfStarsForMessage <= 40) return '💫';
 
-	return Emojis.Minior;
+	return formatEmoji('1063574124171100190', true);
 }
 
 export function getStarPluralizedString(amountOfStarsForMessage: number) {

@@ -1,4 +1,4 @@
-import { OWNERS } from '#root/config';
+import { OwnerMentions } from '#root/config';
 import { BrandingColors, ErrorIdentifiers } from '#utils/constants';
 import { getStarEmojiForAmount } from '#utils/functions/helpers';
 import { getGuildIds } from '#utils/utils';
@@ -35,10 +35,9 @@ export class SlashCommand extends Command {
 		);
 
 		const starboardLeaderboard = starboardLeaderboardResult.unwrapOrElse(() => {
-			const owners = OWNERS.map(userMention);
 			throw new UserError({
 				identifier: ErrorIdentifiers.CannotReceiveLeaderboard,
-				message: `There was an error getting the leaderboard from the leaderboard, please contact my developers: ${owners}.`
+				message: `There was an error getting the leaderboard from the leaderboard, please contact my developers: ${OwnerMentions}.`
 			});
 		});
 

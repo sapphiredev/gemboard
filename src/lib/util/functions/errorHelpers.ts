@@ -1,5 +1,4 @@
-import { OWNERS } from '#root/config';
-import { Emojis } from '#utils/constants';
+import { OwnerMentions } from '#root/config';
 import { isMessageInstance } from '@sapphire/discord.js-utilities';
 import {
 	ArgumentError,
@@ -56,7 +55,7 @@ export async function handleChatInputOrContextMenuCommandError(
 	// Emit where the error was emitted
 	logger.fatal(`[COMMAND] ${command.location.full}\n${error.stack || error.message}`);
 	try {
-		await alert(interaction, generateUnexpectedErrorMessage(interaction, error));
+		await alert(interaction, generateUnexpectedErrorMessage(error));
 	} catch (err) {
 		client.emit(Events.Error, err as Error);
 	}
@@ -64,13 +63,18 @@ export async function handleChatInputOrContextMenuCommandError(
 	return undefined;
 }
 
-function generateUnexpectedErrorMessage(interaction: CommandInteraction, error: Error) {
-	if (OWNERS.includes(interaction.user.id)) return codeBlock('js', error.stack!);
-	return `${Emojis.RedCross} I found an unexpected error, please report the steps you have taken to my developers!`;
+function generateUnexpectedErrorMessage(error: Error) {
+	return [
+		`I found an unexpected error, please report the steps you have taken to ${OwnerMentions}!`,
+		'',
+		'',
+		bold('This is the stacktrace, please send this along with your report:'),
+		codeBlock('js', error.stack!)
+	].join('\n');
 }
 
 function stringError(interaction: CommandInteraction, error: string) {
-	return alert(interaction, `${Emojis.RedCross} Dear ${userMention(interaction.user.id)}, ${error}`);
+	return alert(interaction, `Dear ${userMention(interaction.user.id)}, ${error}`);
 }
 
 function argumentError(interaction: CommandInteraction, error: ArgumentError<unknown>) {

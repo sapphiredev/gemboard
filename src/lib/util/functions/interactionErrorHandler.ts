@@ -1,9 +1,8 @@
-import { OWNERS } from '#root/config';
-import { Emojis } from '#utils/constants';
+import { OwnerMentions } from '#root/config';
 import { getWarnError } from '#utils/functions/errorHelpers';
 import { ArgumentError, container, Events, UserError, type InteractionHandlerError, type InteractionHandlerParseError } from '@sapphire/framework';
 import { codeBlock } from '@sapphire/utilities';
-import { DiscordAPIError, hideLinkEmbed, HTTPError, RESTJSONErrorCodes, userMention, type Interaction } from 'discord.js';
+import { bold, DiscordAPIError, hideLinkEmbed, HTTPError, RESTJSONErrorCodes, userMention, type Interaction } from 'discord.js';
 
 const ignoredCodes = [RESTJSONErrorCodes.UnknownChannel, RESTJSONErrorCodes.UnknownMessage];
 
@@ -34,7 +33,7 @@ export async function handleInteractionError(error: Error, { handler, interactio
 	// Emit where the error was emitted
 	logger.fatal(`[COMMAND] ${handler.location.full}\n${error.stack || error.message}`);
 	try {
-		await alert(interaction, generateUnexpectedErrorMessage(interaction, error));
+		await alert(interaction, generateUnexpectedErrorMessage(error));
 	} catch (err) {
 		client.emit(Events.Error, err as Error);
 	}
@@ -42,13 +41,18 @@ export async function handleInteractionError(error: Error, { handler, interactio
 	return undefined;
 }
 
-function generateUnexpectedErrorMessage(interaction: Interaction, error: Error) {
-	if (OWNERS.includes(interaction.user.id)) return codeBlock('js', error.stack!);
-	return `${Emojis.RedCross} I found an unexpected error, please report the steps you have taken to my developers!`;
+function generateUnexpectedErrorMessage(error: Error) {
+	return [
+		`I found an unexpected error, please report the steps you have taken to ${OwnerMentions}!`,
+		'',
+		'',
+		bold('This is the stacktrace, please send this along with your report:'),
+		codeBlock('js', error.stack!)
+	].join('\n');
 }
 
 function stringError(interaction: Interaction, error: string) {
-	return alert(interaction, `${Emojis.RedCross} Dear ${userMention(interaction.user.id)}, ${error}`);
+	return alert(interaction, `Dear ${userMention(interaction.user.id)}, ${error}`);
 }
 
 function argumentError(interaction: Interaction, error: ArgumentError<unknown>) {

@@ -5,11 +5,12 @@ import { srcFolder } from '#utils/constants';
 import { LogLevel } from '@sapphire/framework';
 import { cast } from '@sapphire/utilities';
 import { envParseString, setup } from '@skyra/env-utilities';
-import { ActivityType, GatewayIntentBits, type ActivitiesOptions, type ClientOptions } from 'discord.js';
+import { ActivityType, GatewayIntentBits, userMention, type ActivitiesOptions, type ClientOptions } from 'discord.js';
 
 setup(new URL('.env', srcFolder));
 
-export const OWNERS = ['268792781713965056', '139836912335716352'];
+const Owners = ['268792781713965056', '139836912335716352'];
+export const OwnerMentions = Owners.map(userMention);
 
 function parsePresenceActivity(): ActivitiesOptions[] {
 	const { CLIENT_PRESENCE_NAME } = process.env;
