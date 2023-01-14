@@ -14,6 +14,12 @@
 
 ---
 
+**TODO List**
+- [ ] Write Leaderboard command
+- [ ] Implement message references
+- [ ] Verify attachments work
+- [ ] Verify attachments are images before using them for setImage
+
 ## About
 
 Gemboard is a private starboard bot for Sapphire. We love starboard functionality but we've found any public bots lacking. They always have one issue or another, so we decided to make our own.
