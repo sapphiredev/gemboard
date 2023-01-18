@@ -3,6 +3,7 @@ import { extractImageUrl, getImageUrl, getStarEmojiForAmount, resolveOnErrorCode
 import { getGuildIds } from '#utils/utils';
 import { ApplyOptions } from '@sapphire/decorators';
 import { ChatInputCommand, Command, Result } from '@sapphire/framework';
+import { isNullishOrEmpty } from '@sapphire/utilities';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -11,6 +12,7 @@ import {
 	Collection,
 	EmbedBuilder,
 	Message,
+	MessageCreateOptions,
 	messageLink,
 	PermissionFlagsBits,
 	RESTJSONErrorCodes,
@@ -64,51 +66,62 @@ export class SlashCommand extends Command {
 	}
 
 	public override async chatInputRun(interaction: ChatInputCommand.Interaction) {
-		this.container.logger.info('Starting reposting...');
+		this.container.logger.warn('Starting reposting...');
 		await interaction.deferReply({ ephemeral: true });
 
-		this.container.logger.info('Starting channel caching...');
+		this.container.logger.warn('Starting channel caching...');
 		await this.cacheChannels(interaction);
-		this.container.logger.info('Finished channel caching...');
+		this.container.logger.warn('Finished channel caching...');
 
-		this.container.logger.info('Starting getting all messages from db...');
+		this.container.logger.warn('Starting getting all messages from db...');
 		const allMessagesThatWereStarred = await this.container.prisma.message.findMany();
-		this.container.logger.info('Finished getting all messages from db...');
+		this.container.logger.warn('Finished getting all messages from db...');
 
 		for (const messageToStar of allMessagesThatWereStarred.reverse()) {
-			this.container.logger.info(`Getting amount of stars for ${messageToStar.snowflake}...`);
+			this.container.logger.warn(`Getting amount of stars for ${messageToStar.snowflake}...`);
 			const amountOfStarsForMessage = await this.container.prisma.userMessage.count({ where: { messageId: messageToStar.snowflake } });
-			this.container.logger.info(`Amount of stars for ${messageToStar.snowflake}: ${amountOfStarsForMessage}`);
+			this.container.logger.warn(`Amount of stars for ${messageToStar.snowflake}: ${amountOfStarsForMessage}`);
 
-			this.container.logger.info('Starting getting actual message object...');
+			this.container.logger.warn('Starting getting actual message object...');
 			const actualMessageObject = await this.fetchActualMessageObject(messageToStar.snowflake.toString());
 
 			if (actualMessageObject) {
 				const actualChannelObject = actualMessageObject.channel.isTextBased() ? (actualMessageObject.channel as TextChannel).name : 'unknown';
-				this.container.logger.info(`Finished getting actual message object, it was in channel #${actualChannelObject}...`);
-				this.container.logger.info(`URL of message: ${actualMessageObject?.url}`);
-				this.container.logger.info('Starting getting starboard channel...');
+				this.container.logger.warn(`Finished getting actual message object, it was in channel #${actualChannelObject}...`);
+				this.container.logger.warn(`URL of message: ${actualMessageObject?.url}`);
+				this.container.logger.warn('Starting getting starboard channel...');
 
 				const starboardChannel = await resolveOnErrorCodes(
 					actualMessageObject.guild!.channels.fetch(StarboardChannelId),
 					RESTJSONErrorCodes.MissingAccess
 				);
-				this.container.logger.info('Finished getting starboard channel...');
+				this.container.logger.warn('Finished getting starboard channel...');
 
 				if (starboardChannel?.isTextBased()) {
 					const content = `${getStarEmojiForAmount(amountOfStarsForMessage)} **${amountOfStarsForMessage}** | ${channelMention(
 						actualMessageObject.channelId
 					)}`;
 
-					this.container.logger.info('Starting sending message to starboard...');
-					const messageOnStarboard = await starboardChannel.send({
-						content,
-						embeds: await this.buildEmbeds(actualMessageObject),
-						components: [this.buildLinkButtons(actualMessageObject)]
-					});
-					this.container.logger.info('Finished sending message to starboard...');
+					this.container.logger.warn('Starting resolving embeds...');
+					const embeds = await this.buildEmbeds(actualMessageObject);
+					this.container.logger.warn('Finished resolving embeds...');
+					this.container.logger.warn('Starting building link buttons...');
+					const component = this.buildLinkButtons(actualMessageObject);
+					this.container.logger.warn('Finished building link buttons...');
 
-					this.container.logger.info('Starting creating starboard message...');
+					this.container.logger.warn('Started resolving payload...');
+					const payload: MessageCreateOptions = {
+						content,
+						embeds,
+						components: [component]
+					};
+					this.container.logger.warn('Finished resolving payload...');
+
+					this.container.logger.warn('Starting sending message to starboard...');
+					const messageOnStarboard = await starboardChannel.send(payload);
+					this.container.logger.warn('Finished sending message to starboard...');
+
+					this.container.logger.warn('Starting creating starboard message...');
 					await this.container.prisma.starboardMessage.create({
 						data: {
 							channelId: BigInt(actualMessageObject.channelId),
@@ -118,7 +131,7 @@ export class SlashCommand extends Command {
 							messageId: BigInt(messageToStar.snowflake)
 						}
 					});
-					this.container.logger.info('Finished creating starboard message...');
+					this.container.logger.warn('Finished creating starboard message...');
 				}
 			} else {
 				this.#failedMessages.add(messageToStar.snowflake);
@@ -193,10 +206,13 @@ export class SlashCommand extends Command {
 				iconURL: message.author.displayAvatarURL(),
 				url: this.getMessageUrl(message, isReferencedMessage)
 			})
-			.setDescription(message.content)
 			.setTimestamp(message.createdAt)
 			.setFooter({ text: `Message ID: ${message.id}` })
 			.setColor(isReferencedMessage ? BrandingColors.ReferencedMessage : BrandingColors.Primary);
+
+		if (!isNullishOrEmpty(message.content)) {
+			embed.setDescription(message.content);
+		}
 
 		if (message.attachments.size) {
 			const firstAttachmentUrl = getImageUrl(message.attachments.first()?.url);
