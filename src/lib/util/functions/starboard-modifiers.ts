@@ -2,7 +2,7 @@ import { BrandingColors, ErrorIdentifiers, StarboardChannelId, StarboardThreshol
 import { extractImageUrl, getImageUrl, getStarEmojiForAmount, getStarPluralizedString, resolveOnErrorCodes } from '#utils/functions/helpers';
 import { ActionRowBuilder, ButtonBuilder, channelMention, EmbedBuilder, messageLink } from '@discordjs/builders';
 import { container, UserError } from '@sapphire/framework';
-import { isNullish } from '@sapphire/utilities';
+import { isNullish, isNullishOrEmpty } from '@sapphire/utilities';
 import { ButtonStyle, RESTJSONErrorCodes, type GuildTextBasedChannel, type MessageContextMenuCommandInteraction } from 'discord.js';
 
 export async function sendMessageToStarboard(interaction: MessageContextMenuCommandInteraction, amountOfStarsForMessage: number) {
@@ -153,10 +153,13 @@ function buildEmbed(message: MessageContextMenuCommandInteraction['targetMessage
 			iconURL: message.author.displayAvatarURL(),
 			url: getMessageUrl(message, isReferencedMessage)
 		})
-		.setDescription(message.content)
 		.setTimestamp(message.createdAt)
 		.setFooter({ text: `Message ID: ${message.id}` })
 		.setColor(isReferencedMessage ? BrandingColors.ReferencedMessage : BrandingColors.Primary);
+
+	if (!isNullishOrEmpty(message.content)) {
+		embed.setDescription(message.content);
+	}
 
 	if (message.attachments.size) {
 		const firstAttachmentUrl = getImageUrl(message.attachments.first()?.url);
