@@ -183,7 +183,14 @@ function buildEmbed(message: MessageContextMenuCommandInteraction['targetMessage
 }
 
 async function addReferencedEmbedToEmbeds(message: MessageContextMenuCommandInteraction['targetMessage'], embeds: EmbedBuilder[]) {
-	if (embeds.length <= 10 && message.reference && message.reference.messageId && message.reference.guildId) {
+	if (
+		embeds.length <= 10 &&
+		message.reference &&
+		message.reference.messageId &&
+		message.reference.guildId &&
+		message.reference.channelId === message.channelId &&
+		message.reference.guildId === message.guildId
+	) {
 		const referencedGuild = await container.client.guilds.fetch(message.reference.guildId);
 		const referencedChannel = await referencedGuild.channels.fetch(message.reference.channelId);
 
@@ -210,7 +217,14 @@ function buildLinkButtons(interaction: MessageContextMenuCommandInteraction) {
 
 	actionRow.addComponents(originalMessageButton);
 
-	if (interaction.targetMessage.reference && interaction.targetMessage.reference.messageId && interaction.targetMessage.reference.guildId) {
+	if (
+		interaction.targetMessage.reference &&
+		interaction.targetMessage.reference.messageId &&
+		interaction.targetMessage.reference.channelId &&
+		interaction.targetMessage.reference.guildId &&
+		interaction.targetMessage.reference.channelId === interaction.channelId &&
+		interaction.targetMessage.reference.guildId === interaction.guildId
+	) {
 		const referencedMessageButton = new ButtonBuilder() //
 			.setLabel('First Referenced Message')
 			.setURL(getMessageUrl(interaction.targetMessage, true))

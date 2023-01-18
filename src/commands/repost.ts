@@ -236,7 +236,15 @@ export class SlashCommand extends Command {
 	}
 
 	private async addReferencedEmbedToEmbeds(message: Message<boolean>, embeds: EmbedBuilder[]) {
-		if (embeds.length <= 10 && message.reference && message.reference.messageId && message.reference.guildId) {
+		if (
+			embeds.length <= 10 &&
+			message.reference &&
+			message.reference.messageId &&
+			message.reference.channelId &&
+			message.reference.guildId &&
+			message.reference.channelId === message.channelId &&
+			message.reference.guildId === message.guildId
+		) {
 			const referencedGuild = await this.container.client.guilds.fetch(message.reference.guildId);
 			const referencedChannel = await referencedGuild.channels.fetch(message.reference.channelId);
 
@@ -263,7 +271,14 @@ export class SlashCommand extends Command {
 
 		actionRow.addComponents(originalMessageButton);
 
-		if (actualMessageObject.reference && actualMessageObject.reference.messageId && actualMessageObject.reference.guildId) {
+		if (
+			actualMessageObject.reference &&
+			actualMessageObject.reference.messageId &&
+			actualMessageObject.reference.channelId &&
+			actualMessageObject.reference.guildId &&
+			actualMessageObject.reference.channelId === actualMessageObject.channelId &&
+			actualMessageObject.reference.guildId === actualMessageObject.guildId
+		) {
 			const referencedMessageButton = new ButtonBuilder() //
 				.setLabel('First Referenced Message')
 				.setURL(this.getMessageUrl(actualMessageObject, true))
