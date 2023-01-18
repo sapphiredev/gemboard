@@ -25,7 +25,7 @@ function parsePresenceActivity(): ActivitiesOptions[] {
 }
 
 export const CLIENT_OPTIONS: ClientOptions = {
-	intents: [GatewayIntentBits.Guilds],
+	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
 	allowedMentions: { users: [], roles: [] },
 	presence: { activities: parsePresenceActivity() },
 	loadDefaultErrorListeners: false,
