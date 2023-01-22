@@ -31,7 +31,7 @@
 		"@sapphire/decorators": "^6.0.0",
 		"@sapphire/discord-utilities": "^3.0.0",
 		"@sapphire/discord.js-utilities": "^6.0.1",
-		"@sapphire/framework": "^4.0.1",
+		"@sapphire/framework": "^4.0.2",
 		"@sapphire/plugin-logger": "^3.0.1",
 		"@sapphire/time-utilities": "^1.7.8",
 		"@sapphire/utilities": "^3.11.0",
