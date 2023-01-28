@@ -9,7 +9,7 @@ import { isNullish } from '@sapphire/utilities';
 import { bold, userMention } from 'discord.js';
 
 @ApplyOptions<ChatInputCommand.Options>({
-	preconditions: ['ValidServer', 'ValidChannel'],
+	preconditions: ['ValidServer', 'ValidCommandChannel'],
 	description: 'Gets the leaderboard of users who most starred messages.'
 })
 export class SlashCommand extends Command {

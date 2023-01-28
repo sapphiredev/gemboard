@@ -8,7 +8,7 @@ import { deepClone } from '@sapphire/utilities';
 import { PermissionFlagsBits, RESTJSONErrorCodes } from 'discord.js';
 
 @ApplyOptions<ChatInputCommand.Options>({
-	preconditions: ['ValidServer', 'ValidChannel'],
+	preconditions: ['ValidServer', 'ValidCommandChannel'],
 	description: 'Migrates the starboard message colors.'
 })
 export class SlashCommand extends Command {

@@ -1,4 +1,4 @@
-import { bannedChannels, StarboardChannelId } from '#utils/constants';
+import { bannedStarChannels, StarboardChannelId } from '#utils/constants';
 import { resolveOnErrorCodes } from '#utils/functions/helpers';
 import { ApplyOptions } from '@sapphire/decorators';
 import { Events, Listener } from '@sapphire/framework';
@@ -12,7 +12,7 @@ import { Message, RESTJSONErrorCodes } from 'discord.js';
 export class UserListener extends Listener<typeof Events.MessageDelete> {
 	public async run(message: Message) {
 		if (message.guildId === envParseString('COMMAND_GUILD_ID')) return;
-		if (bannedChannels.has(message.channelId)) return;
+		if (bannedStarChannels.has(message.channelId)) return;
 
 		const starboardMessage = await this.container.prisma.starboardMessage.findFirst({
 			where: {

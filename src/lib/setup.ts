@@ -24,6 +24,7 @@ declare module '@sapphire/framework' {
 	interface Preconditions {
 		ValidServer: never;
 		ValidChannel: never;
+		ValidCommandChannel: never;
 		IsMessageContextMenuCommand: never;
 		NoSelfStar: never;
 	}
