@@ -1,4 +1,5 @@
-import { tryParseURL } from '@sapphire/utilities';
+import { BrandingColors } from '#utils/constants';
+import { isNullish, tryParseURL } from '@sapphire/utilities';
 import { DiscordAPIError, formatEmoji, RESTJSONErrorCodes } from 'discord.js';
 
 export function getStarEmojiForAmount(amountOfStarsForMessage: number): string {
@@ -8,6 +9,17 @@ export function getStarEmojiForAmount(amountOfStarsForMessage: number): string {
 	if (amountOfStarsForMessage <= 40) return '💫';
 
 	return formatEmoji('1063574124171100190', true);
+}
+
+export function getEmbedColorForAmount(amountOfStarsForMessage: number | undefined): number {
+	if (isNullish(amountOfStarsForMessage)) return BrandingColors.Primary;
+
+	if (amountOfStarsForMessage <= 10) return 0xf1ee8e;
+	if (amountOfStarsForMessage <= 20) return 0xece75f;
+	if (amountOfStarsForMessage <= 30) return 0xe8e337;
+	if (amountOfStarsForMessage <= 40) return 0xe5de00;
+
+	return 0xe6cc00;
 }
 
 export function getStarPluralizedString(amountOfStarsForMessage: number) {

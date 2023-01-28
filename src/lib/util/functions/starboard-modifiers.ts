@@ -1,5 +1,12 @@
 import { BrandingColors, ErrorIdentifiers, StarboardChannelId, StarboardThreshold } from '#utils/constants';
-import { extractImageUrl, getImageUrl, getStarEmojiForAmount, getStarPluralizedString, resolveOnErrorCodes } from '#utils/functions/helpers';
+import {
+	extractImageUrl,
+	getEmbedColorForAmount,
+	getImageUrl,
+	getStarEmojiForAmount,
+	getStarPluralizedString,
+	resolveOnErrorCodes
+} from '#utils/functions/helpers';
 import { ActionRowBuilder, ButtonBuilder, channelMention, EmbedBuilder, messageLink } from '@discordjs/builders';
 import { container, UserError } from '@sapphire/framework';
 import { isNullish, isNullishOrEmpty } from '@sapphire/utilities';
@@ -112,7 +119,7 @@ async function postMessage(
 ) {
 	const messageOnStarboard = await starboardChannel.send({
 		content,
-		embeds: await buildEmbeds(interaction),
+		embeds: await buildEmbeds(interaction, amountOfStarsForMessage),
 		components: [buildLinkButtons(interaction)]
 	});
 
@@ -134,9 +141,8 @@ async function postMessage(
 	});
 }
 
-async function buildEmbeds(interaction: MessageContextMenuCommandInteraction) {
-	const embedOfStarredMessage = buildEmbed(interaction.targetMessage);
-
+async function buildEmbeds(interaction: MessageContextMenuCommandInteraction, amountOfStarsForMessage: number) {
+	const embedOfStarredMessage = buildEmbed({ message: interaction.targetMessage, amountOfStarsForMessage });
 	const embeds: EmbedBuilder[] = [embedOfStarredMessage];
 
 	await addReferencedEmbedToEmbeds(interaction.targetMessage, embeds);
@@ -144,7 +150,12 @@ async function buildEmbeds(interaction: MessageContextMenuCommandInteraction) {
 	return embeds;
 }
 
-function buildEmbed(message: MessageContextMenuCommandInteraction['targetMessage'], isReferencedMessage = false) {
+interface BuildEmbedParameters {
+	message: MessageContextMenuCommandInteraction['targetMessage'];
+	isReferencedMessage?: boolean;
+	amountOfStarsForMessage?: number;
+}
+function buildEmbed({ message, amountOfStarsForMessage, isReferencedMessage = false }: BuildEmbedParameters) {
 	const authorName = isReferencedMessage ? `Replying to ${message.author.tag}` : message.author.tag;
 
 	const embed = new EmbedBuilder()
@@ -155,7 +166,7 @@ function buildEmbed(message: MessageContextMenuCommandInteraction['targetMessage
 		})
 		.setTimestamp(message.createdAt)
 		.setFooter({ text: `Message ID: ${message.id}` })
-		.setColor(isReferencedMessage ? BrandingColors.ReferencedMessage : BrandingColors.Primary);
+		.setColor(isReferencedMessage ? BrandingColors.ReferencedMessage : getEmbedColorForAmount(amountOfStarsForMessage));
 
 	if (!isNullishOrEmpty(message.content)) {
 		embed.setDescription(message.content);
@@ -197,7 +208,7 @@ async function addReferencedEmbedToEmbeds(message: MessageContextMenuCommandInte
 		if (referencedChannel?.isTextBased()) {
 			const referencedMessage = await referencedChannel.messages.fetch(message.reference.messageId);
 
-			const embedOfReferencedMessage = buildEmbed(referencedMessage, true);
+			const embedOfReferencedMessage = buildEmbed({ message: referencedMessage, isReferencedMessage: true });
 			embeds.unshift(embedOfReferencedMessage);
 
 			if (referencedMessage.reference) {
