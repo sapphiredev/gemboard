@@ -1265,15 +1265,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bindings@npm:^1.5.0":
-  version: 1.5.0
-  resolution: "bindings@npm:1.5.0"
-  dependencies:
-    file-uri-to-path: 1.0.0
-  checksum: 65b6b48095717c2e6105a021a7da4ea435aa8d3d3cd085cb9e85bcb6e5773cf318c4745c3f7c504412855940b585bdf9b918236612a1c7a7942491de176f1ae7
-  languageName: node
-  linkType: hard
-
 "bl@npm:^4.1.0":
   version: 4.1.0
   resolution: "bl@npm:4.1.0"
@@ -1984,16 +1975,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"erlpack@github:discord/erlpack":
-  version: 0.1.3
-  resolution: "erlpack@https://github.com/discord/erlpack.git#commit=cbe76be04c2210fc9cb6ff95910f0937c1011d04"
-  dependencies:
-    bindings: ^1.5.0
-    nan: ^2.15.0
-  checksum: b6cf7612a82058f69f32251378233791bbff8d09604ffd3bbd0e9f6a9d6388451deb012424fb08850f6d69d53333c7e0f118532061855af9e6549a8e58a8c392
-  languageName: node
-  linkType: hard
-
 "err-code@npm:^2.0.2":
   version: 2.0.3
   resolution: "err-code@npm:2.0.3"
@@ -2575,13 +2556,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"file-uri-to-path@npm:1.0.0":
-  version: 1.0.0
-  resolution: "file-uri-to-path@npm:1.0.0"
-  checksum: b648580bdd893a008c92c7ecc96c3ee57a5e7b6c4c18a9a09b44fb5d36d79146f8e442578bc0e173dc027adf3987e254ba1dfd6e3ec998b7c282873010502144
-  languageName: node
-  linkType: hard
-
 "fill-range@npm:^7.0.1":
   version: 7.0.1
   resolution: "fill-range@npm:7.0.1"
@@ -2765,7 +2739,6 @@ __metadata:
     colorette: ^2.0.19
     cz-conventional-changelog: ^3.3.0
     discord.js: ^14.7.1
-    erlpack: "github:discord/erlpack"
     eslint: ^8.33.0
     eslint-config-prettier: ^8.6.0
     eslint-plugin-prettier: ^4.2.1
@@ -2773,7 +2746,6 @@ __metadata:
     gradient-string: ^2.0.2
     husky: ^8.0.3
     lint-staged: ^13.1.0
-    node-gyp: ^9.3.1
     prettier: ^2.8.3
     prettier-plugin-prisma: ^4.9.0
     pretty-quick: ^3.1.3
@@ -3973,7 +3945,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nan@npm:^2.14.0, nan@npm:^2.15.0":
+"nan@npm:^2.14.0":
   version: 2.17.0
   resolution: "nan@npm:2.17.0"
   dependencies:
@@ -4014,7 +3986,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-gyp@npm:^9.3.1, node-gyp@npm:latest":
+"node-gyp@npm:latest":
   version: 9.3.1
   resolution: "node-gyp@npm:9.3.1"
   dependencies:
