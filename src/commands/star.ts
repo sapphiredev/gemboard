@@ -1,6 +1,6 @@
 import { ErrorIdentifiers, StarboardThreshold } from '#utils/constants';
 import { getStarEmojiForAmount, getStarPluralizedString } from '#utils/functions/helpers';
-import { sendMessageToStarboard } from '#utils/functions/starboard-modifiers';
+import { replySuccessfullyStarredMessage, sendMessageToStarboard } from '#utils/functions/starboard-modifiers';
 import { getGuildIds } from '#utils/utils';
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command, UserError } from '@sapphire/framework';
@@ -78,11 +78,6 @@ export class SlashCommand extends Command {
 			return sendMessageToStarboard(interaction, amountOfStarsForMessage);
 		}
 
-		const starEmoji = getStarEmojiForAmount(amountOfStarsForMessage);
-		const starPluralized = getStarPluralizedString(amountOfStarsForMessage);
-		return interaction.reply({
-			content: `You just starred a message! It now has ${starEmoji} ${amountOfStarsForMessage} ${starPluralized}.`,
-			ephemeral: true
-		});
+		return replySuccessfullyStarredMessage(interaction, amountOfStarsForMessage);
 	}
 }

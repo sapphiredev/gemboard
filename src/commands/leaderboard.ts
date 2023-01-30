@@ -2,11 +2,10 @@ import { OwnerMentions } from '#root/config';
 import { BrandingColors, ErrorIdentifiers } from '#utils/constants';
 import { getStarEmojiForAmount } from '#utils/functions/helpers';
 import { getGuildIds } from '#utils/utils';
-import { EmbedBuilder } from '@discordjs/builders';
 import { ApplyOptions } from '@sapphire/decorators';
 import { ChatInputCommand, Command, Result, UserError } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
-import { bold, userMention } from 'discord.js';
+import { bold, EmbedBuilder, userMention } from 'discord.js';
 
 @ApplyOptions<ChatInputCommand.Options>({
 	preconditions: ['ValidServer', 'ValidCommandChannel'],

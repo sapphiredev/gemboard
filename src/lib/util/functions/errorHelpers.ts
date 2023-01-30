@@ -1,5 +1,4 @@
 import { OwnerMentions } from '#root/config';
-import { isMessageInstance } from '@sapphire/discord.js-utilities';
 import {
 	ArgumentError,
 	container,
@@ -15,12 +14,12 @@ import {
 	hideLinkEmbed,
 	HTTPError,
 	hyperlink,
+	Message,
 	RESTJSONErrorCodes,
 	userMention,
 	type APIMessage,
 	type BaseInteraction,
-	type CommandInteraction,
-	type Message
+	type CommandInteraction
 } from 'discord.js';
 
 const ignoredCodes = [RESTJSONErrorCodes.UnknownChannel, RESTJSONErrorCodes.UnknownMessage];
@@ -119,7 +118,7 @@ async function alert(interaction: CommandInteraction, content: string) {
  * @param url The url to format.
  */
 export function getLinkLine(message: APIMessage | Message): string {
-	if (isMessageInstance(message)) {
+	if (message instanceof Message) {
 		return bold(hyperlink('Jump to Message!', hideLinkEmbed(message.url)));
 	}
 

@@ -7,10 +7,24 @@ import {
 	getStarPluralizedString,
 	resolveOnErrorCodes
 } from '#utils/functions/helpers';
-import { ActionRowBuilder, ButtonBuilder, channelMention, EmbedBuilder, messageLink } from '@discordjs/builders';
+
 import { container, UserError } from '@sapphire/framework';
 import { isNullish, isNullishOrEmpty } from '@sapphire/utilities';
-import { ButtonStyle, RESTJSONErrorCodes, type GuildTextBasedChannel, type MessageContextMenuCommandInteraction } from 'discord.js';
+import {
+	ActionRowBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+	channelMention,
+	EmbedBuilder,
+	hideLinkEmbed,
+	hyperlink,
+	Message,
+	messageLink,
+	RESTJSONErrorCodes,
+	userMention,
+	type GuildTextBasedChannel,
+	type MessageContextMenuCommandInteraction
+} from 'discord.js';
 
 export async function sendMessageToStarboard(interaction: MessageContextMenuCommandInteraction, amountOfStarsForMessage: number) {
 	const content = `${getStarEmojiForAmount(amountOfStarsForMessage)} **${amountOfStarsForMessage}** | ${channelMention(interaction.channelId)}`;
@@ -46,12 +60,7 @@ export async function sendMessageToStarboard(interaction: MessageContextMenuComm
 		await discordMessage.edit({ content });
 	}
 
-	const starEmoji = getStarEmojiForAmount(amountOfStarsForMessage);
-	const starPluralized = getStarPluralizedString(amountOfStarsForMessage);
-	return interaction.reply({
-		content: `You just starred a message! It now has ${starEmoji} ${amountOfStarsForMessage} ${starPluralized}.\nI have edited the starboad message with the new amount.`,
-		ephemeral: true
-	});
+	return replySuccessfullyStarredMessage(interaction, amountOfStarsForMessage, discordMessage);
 }
 
 export async function deleteMessageFromStarboard(interaction: MessageContextMenuCommandInteraction, amountOfStarsForMessage: number) {
@@ -75,12 +84,7 @@ export async function deleteMessageFromStarboard(interaction: MessageContextMenu
 
 	if (isNullish(alreadyPostedMessage)) {
 		// The message that was unstarred was never on the starboard to begin with
-		const starEmoji = getStarEmojiForAmount(amountOfStarsForMessage);
-		const starPluralized = getStarPluralizedString(amountOfStarsForMessage);
-		return interaction.reply({
-			content: `Successfully removed your star. The message now has ${starEmoji} ${amountOfStarsForMessage} ${starPluralized}.`,
-			ephemeral: true
-		});
+		return replySuccessfullyUnstarredMessage(interaction, amountOfStarsForMessage);
 	}
 
 	const deletedStarboardMessageEntry = await container.prisma.starboardMessage.delete({
@@ -105,10 +109,71 @@ export async function deleteMessageFromStarboard(interaction: MessageContextMenu
 		await discordMessage.delete();
 	}
 
+	return replySuccessfullyUnstarredMessage(interaction, amountOfStarsForMessage, true);
+}
+
+export function replySuccessfullyStarredMessage(
+	interaction: MessageContextMenuCommandInteraction,
+	amountOfStarsForMessage: number,
+	editedStarboardMessage?: Message<true> | null
+) {
+	const starEmoji = getStarEmojiForAmount(amountOfStarsForMessage);
+	const starPluralized = getStarPluralizedString(amountOfStarsForMessage);
+
+	const authorMention = userMention(interaction.user.id);
+	const msgUrl = interaction.targetMessage.url;
+	const embeddedMsgLink = hyperlink('message', hideLinkEmbed(msgUrl));
+
+	const componentMessageLinks: [label: string, url: string][] = [['Go to message', interaction.targetMessage.url]];
+
+	if (editedStarboardMessage) {
+		componentMessageLinks.push(['Starboard Message', editedStarboardMessage.url]);
+	}
+
 	return interaction.reply({
-		content: `Successfully removed your star.\nThis dropped the message below the threshold of ${StarboardThreshold} so I have deleted the message from the starboard.`,
-		ephemeral: true
+		content: `${authorMention} just starred a ${embeddedMsgLink}! It now has ${starEmoji} ${amountOfStarsForMessage} ${starPluralized}.`,
+		components: [buildReplyComponents(...componentMessageLinks)]
 	});
+}
+
+function replySuccessfullyUnstarredMessage(
+	interaction: MessageContextMenuCommandInteraction,
+	amountOfStarsForMessage: number,
+	droppedBelowThreshold = false
+) {
+	const authorMention = userMention(interaction.user.id);
+	const msgUrl = interaction.targetMessage.url;
+	const embeddedMsgLink = hyperlink('message', hideLinkEmbed(msgUrl));
+
+	if (droppedBelowThreshold) {
+		return interaction.reply({
+			content: `Awe shucks, ${authorMention} removed their star from a ${embeddedMsgLink}.\nThis dropped the ${embeddedMsgLink} below the threshold of ${StarboardThreshold} so I have deleted the ${embeddedMsgLink} from the starboard.`,
+			components: [buildReplyComponents(['Go to message', interaction.targetMessage.url])]
+		});
+	}
+
+	const starEmoji = getStarEmojiForAmount(amountOfStarsForMessage);
+	const starPluralized = getStarPluralizedString(amountOfStarsForMessage);
+
+	return interaction.reply({
+		content: `Oh noes, ${authorMention} removed their star from a ${embeddedMsgLink}. The ${embeddedMsgLink} now has ${starEmoji} ${amountOfStarsForMessage} ${starPluralized}.`,
+		components: [buildReplyComponents(['Go to message', interaction.targetMessage.url])]
+	});
+}
+
+function buildReplyComponents(...messages: [label: string, messageUrl: string][]) {
+	const actionRow = new ActionRowBuilder<ButtonBuilder>();
+
+	for (const [label, url] of messages) {
+		actionRow.addComponents(
+			new ButtonBuilder() //
+				.setLabel(label)
+				.setURL(url)
+				.setStyle(ButtonStyle.Link)
+		);
+	}
+
+	return actionRow;
 }
 
 async function postMessage(
@@ -135,9 +200,14 @@ async function postMessage(
 
 	const starEmoji = getStarEmojiForAmount(amountOfStarsForMessage);
 	const starPluralized = getStarPluralizedString(amountOfStarsForMessage);
+	const authorMention = userMention(interaction.user.id);
+	const msgUrl = interaction.targetMessage.url;
+	const starboardChannelMention = channelMention(StarboardChannelId);
+	const embeddedMsgLink = hyperlink('message', hideLinkEmbed(msgUrl));
+
 	return interaction.reply({
-		content: `You just starred a message! It now has ${starEmoji} ${amountOfStarsForMessage} ${starPluralized}.\nThis means it has passed the threshold, so I have added it to the starboard.`,
-		ephemeral: true
+		content: `Woop! ${authorMention} just starred a ${embeddedMsgLink}! It now has ${starEmoji} ${amountOfStarsForMessage} ${starPluralized}.\nThis means it has passed the threshold, so I have added it to the ${starboardChannelMention}.`,
+		components: [buildReplyComponents(['Starred message', interaction.targetMessage.url], ['Starboard message', messageOnStarboard.url])]
 	});
 }
 
