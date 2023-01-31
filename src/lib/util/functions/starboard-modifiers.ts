@@ -171,8 +171,16 @@ export function replySuccessfullyStarredMessage(
 		componentMessageLinks.push(['Starboard Message', editedStarboardMessage.url]);
 	}
 
+	let content = `You just starred a ${embeddedMsgLink}! It now has ${starEmoji} ${amountOfStarsForMessage} ${starPluralized}.`;
+	if (!editedStarboardMessage && amountOfStarsForMessage >= StarboardThreshold) {
+		const starboardChannelMention = channelMention(StarboardChannelId);
+		content = content.concat(
+			`\nThis means it has passed the threshold of ${StarboardThreshold} so I have posted it to the ${starboardChannelMention}!`
+		);
+	}
+
 	return interaction.reply({
-		content: `You just starred a ${embeddedMsgLink}! It now has ${starEmoji} ${amountOfStarsForMessage} ${starPluralized}.`,
+		content,
 		components: [buildReplyComponents(...componentMessageLinks)],
 		ephemeral: true
 	});
