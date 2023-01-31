@@ -1,18 +1,23 @@
-import { ErrorIdentifiers, StarboardThreshold } from '#utils/constants';
+import { StarboardThreshold } from '#utils/constants';
 import { messageReactionListenerPreflightChecks } from '#utils/functions/helpers';
 import { sendMessageToStarboard } from '#utils/functions/starboard-modifiers';
-import { Events, Listener, UserError } from '@sapphire/framework';
+import { ApplyOptions } from '@sapphire/decorators';
+import { Events, Listener } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
-import type { MessageReaction, User } from 'discord.js';
+import type { MessageReaction, PartialMessageReaction, User } from 'discord.js';
 
+@ApplyOptions<Listener.Options>({
+	event: Events.MessageReactionAdd
+})
 export class UserListener extends Listener<typeof Events.MessageReactionAdd> {
-	public async run(messageReaction: MessageReaction, user: User) {
+	public async run(partialMessageReaction: MessageReaction | PartialMessageReaction, user: User) {
+		const messageReaction = await partialMessageReaction.fetch();
 		const targetMessage = await messageReaction.message.fetch();
 
 		if (messageReactionListenerPreflightChecks(messageReaction, user, targetMessage)) return;
 
 		const messageToStar = BigInt(targetMessage.id);
-		const userWhoStarred = BigInt(targetMessage.author.id);
+		const userWhoStarred = BigInt(user.id);
 
 		let userFromDatabase = await this.container.prisma.user.findFirst({ where: { snowflake: userWhoStarred } });
 
@@ -39,11 +44,6 @@ export class UserListener extends Listener<typeof Events.MessageReactionAdd> {
 				});
 			} else {
 				await messageReaction.remove();
-
-				throw new UserError({
-					identifier: ErrorIdentifiers.UserAlreadyStarredMessage,
-					message: `You already starred this message, so I removed your reaction.`
-				});
 			}
 		} else {
 			await this.container.prisma.message.create({

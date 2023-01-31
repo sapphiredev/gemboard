@@ -1,36 +1,31 @@
-import { ErrorIdentifiers, StarboardThreshold } from '#utils/constants';
+import { StarboardThreshold } from '#utils/constants';
 import { messageReactionListenerPreflightChecks } from '#utils/functions/helpers';
 import { deleteMessageFromStarboard, sendMessageToStarboard } from '#utils/functions/starboard-modifiers';
-import { Events, Listener, UserError } from '@sapphire/framework';
+import { ApplyOptions } from '@sapphire/decorators';
+import { Events, Listener } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
-import type { MessageReaction, User } from 'discord.js';
+import type { MessageReaction, PartialMessageReaction, User } from 'discord.js';
 
+@ApplyOptions<Listener.Options>({
+	event: Events.MessageReactionRemove
+})
 export class UserListener extends Listener<typeof Events.MessageReactionRemove> {
-	public async run(messageReaction: MessageReaction, user: User) {
+	public async run(partialMessageReaction: MessageReaction | PartialMessageReaction, user: User) {
+		const messageReaction = await partialMessageReaction.fetch();
 		const targetMessage = await messageReaction.message.fetch();
 
 		if (messageReactionListenerPreflightChecks(messageReaction, user, targetMessage)) return;
 
 		const messageToUnStar = BigInt(targetMessage.id);
-		const userWhoUnStarred = BigInt(targetMessage.author.id);
+		const userWhoUnStarred = BigInt(user.id);
 
 		const userFromDatabase = await this.container.prisma.user.findFirst({ where: { snowflake: userWhoUnStarred } });
 
-		if (isNullish(userFromDatabase)) {
-			throw new UserError({
-				identifier: ErrorIdentifiers.UserNotFoundInDatabase,
-				message: 'Looks like you never starred a message before, how about you star something first?'
-			});
-		}
+		if (isNullish(userFromDatabase)) return;
 
 		const messageFromDatabase = await this.container.prisma.message.findFirst({ where: { snowflake: messageToUnStar } });
 
-		if (isNullish(messageFromDatabase)) {
-			throw new UserError({
-				identifier: ErrorIdentifiers.MessageNotFoundInDatabase,
-				message: "Looks like that message hasn't been starred yet by anyone, will you be the first?"
-			});
-		}
+		if (isNullish(messageFromDatabase)) return;
 
 		const userHasStarredMessage = await this.container.prisma.userMessage.findFirst({
 			where: {
@@ -39,12 +34,7 @@ export class UserListener extends Listener<typeof Events.MessageReactionRemove> 
 			}
 		});
 
-		if (isNullish(userHasStarredMessage)) {
-			throw new UserError({
-				identifier: ErrorIdentifiers.UserHasNotStarredMessage,
-				message: 'You have not yet starred that message, why not do so now?'
-			});
-		}
+		if (isNullish(userHasStarredMessage)) return;
 
 		await this.container.prisma.userMessage.delete({
 			where: {

@@ -69,6 +69,9 @@ export function messageReactionListenerPreflightChecks(messageReaction: MessageR
 	// If there is no message author then return
 	if (!message.author) return true;
 
+	// Prevent bot messages to be starred
+	if (message.author.bot) return true;
+
 	// Prevent users from self-starring
 	if (user.id === message.author.id) return true;
 
