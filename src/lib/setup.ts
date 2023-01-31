@@ -27,6 +27,7 @@ declare module '@sapphire/framework' {
 		ValidCommandChannel: never;
 		IsMessageContextMenuCommand: never;
 		NoSelfStar: never;
+		NoBotStar: never;
 	}
 }
 

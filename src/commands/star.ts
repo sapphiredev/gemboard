@@ -8,7 +8,7 @@ import { isNullish } from '@sapphire/utilities';
 import { ApplicationCommandType, type MessageContextMenuCommandInteraction } from 'discord.js';
 
 @ApplyOptions<Command.Options>({
-	preconditions: ['IsMessageContextMenuCommand', 'NoSelfStar', 'ValidServer', 'ValidChannel']
+	preconditions: ['IsMessageContextMenuCommand', 'NoSelfStar', 'NoBotStar', 'ValidServer', 'ValidChannel']
 })
 export class SlashCommand extends Command {
 	public override registerApplicationCommands(registry: Command.Registry) {
