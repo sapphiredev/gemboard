@@ -1,3 +1,4 @@
+import { Owners } from '#root/config';
 import { generateUnexpectedErrorMessage, ignoredCodes } from '#utils/functions/errorHelpers';
 import { resolveOnErrorCodes } from '#utils/functions/helpers';
 import { Events, Listener, ListenerErrorPayload, Piece, UserError } from '@sapphire/framework';
@@ -9,14 +10,16 @@ export class ListenerError extends Listener<typeof Events.ListenerError> {
 
 	public async run(error: Error, { piece }: ListenerErrorPayload) {
 		if (typeof error === 'string') return this.stringError(error);
-		if (error instanceof UserError) return this.userError(error);
+		if (error instanceof UserError) return this.userError(piece, error);
 
 		const { client, logger } = this.container;
-		// If the error was an AbortError or an Internal Server Error, tell the user to re-try:
-		if (error.name === 'AbortError' || error.message === 'Internal Server Error') {
-			logger.warn(this.getWarnError(error, piece));
-			return this.alert('I had a small network error when messaging Discord. Please run this command again!');
-		}
+
+		// If the error was an AbortError or an Internal Server Error, do nothing,
+		// because in the infinite knowledge of message reactions and listener
+		// errors there is absolutely no way to send a message to the channel that the error originated from.
+		// If people complain that their stars aren't being registered then big L for them and they can just
+		// use the message context menu command
+		if (error.name === 'AbortError' || error.message === 'Internal Server Error') return;
 
 		// Extract useful information about the DiscordAPIError
 		if (error instanceof DiscordAPIError || error instanceof HTTPError) {
@@ -40,16 +43,20 @@ export class ListenerError extends Listener<typeof Events.ListenerError> {
 		return undefined;
 	}
 
-	private stringError(error: string) {
-		return this.alert(error);
+	private stringError(stringError: string) {
+		return this.alert(stringError);
 	}
 
-	private userError(error: UserError) {
+	private async userError(piece: Piece, error: UserError) {
 		if (Reflect.get(Object(error.context), 'silent')) return;
 
-		return this.alert(
-			error.message || `An error occurred that I was not able to identify during a listener. Check the console for more details.`
-		);
+		this.container.logger.error(`[LISTENER] ${piece.location.full}\n${error.stack || error.message}`);
+
+		try {
+			await this.alert(generateUnexpectedErrorMessage(error));
+		} catch (err) {
+			this.container.client.emit(Events.Error, err as Error);
+		}
 	}
 
 	private async alert(content: string) {
@@ -68,7 +75,12 @@ export class ListenerError extends Listener<typeof Events.ListenerError> {
 
 		if (!modBotCommandsChannel || !modBotCommandsChannel.isTextBased()) return;
 
-		return modBotCommandsChannel.send(content);
+		return modBotCommandsChannel.send({
+			content,
+			allowedMentions: {
+				users: Owners
+			}
+		});
 	}
 
 	private getWarnError(error: Error, piece: Piece) {

@@ -9,7 +9,7 @@ import { ActivityType, GatewayIntentBits, Partials, userMention, type Activities
 
 setup(new URL('.env', srcFolder));
 
-const Owners = ['268792781713965056', '139836912335716352'];
+export const Owners = ['268792781713965056', '139836912335716352'];
 export const OwnerMentions = Owners.map(userMention);
 
 function parsePresenceActivity(): ActivitiesOptions[] {
