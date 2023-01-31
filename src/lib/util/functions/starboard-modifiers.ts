@@ -21,19 +21,18 @@ import {
 	hyperlink,
 	Message,
 	messageLink,
-	MessageReaction,
 	RESTJSONErrorCodes,
 	type GuildTextBasedChannel,
 	type MessageContextMenuCommandInteraction
 } from 'discord.js';
 
-export async function sendMessageToStarboard2(
+export async function sendMessageToStarboard(
 	channelId: string,
 	guild: Guild,
 	targetId: string,
 	targetMessage: Message,
 	amountOfStarsForMessage: number
-) {
+): Promise<Message<true> | null> {
 	const content = `${getStarEmojiForAmount(amountOfStarsForMessage)} **${amountOfStarsForMessage}** | ${channelMention(channelId)}`;
 	const starboardChannel = await resolveOnErrorCodes(guild.channels.fetch(StarboardChannelId), RESTJSONErrorCodes.MissingAccess);
 
@@ -54,68 +53,8 @@ export async function sendMessageToStarboard2(
 	});
 
 	if (isNullish(alreadyPostedMessage)) {
-		await postMessage2(channelId, guild.id, targetMessage.author.id, targetId, starboardChannel, content, amountOfStarsForMessage);
-	} else {
-		const discordMessage = await resolveOnErrorCodes(
-			starboardChannel.messages.fetch(alreadyPostedMessage.snowflake.toString()),
-			RESTJSONErrorCodes.UnknownMessage,
-			RESTJSONErrorCodes.MissingAccess
-		);
-
-		if (!isNullish(discordMessage)) {
-			await discordMessage.edit({ content });
-		}
-	}
-}
-
-async function postMessage2(
-	channelId: string,
-	guildId: string,
-	targetMessageAuthorId: string,
-	targetId: string,
-	starboardChannel: GuildTextBasedChannel,
-	content: string,
-	amountOfStarsForMessage: number
-) {
-	const messageOnStarboard = await starboardChannel.send({
-		content,
-		embeds: await buildEmbeds(interaction, amountOfStarsForMessage),
-		components: [buildLinkButtons(interaction)]
-	});
-
-	await container.prisma.starboardMessage.create({
-		data: {
-			channelId: BigInt(channelId),
-			guildId: BigInt(guildId),
-			snowflake: BigInt(messageOnStarboard.id),
-			authorId: BigInt(targetMessageAuthorId),
-			messageId: BigInt(targetId)
-		}
-	});
-}
-
-export async function sendMessageToStarboard(interaction: MessageContextMenuCommandInteraction, amountOfStarsForMessage: number) {
-	const content = `${getStarEmojiForAmount(amountOfStarsForMessage)} **${amountOfStarsForMessage}** | ${channelMention(interaction.channelId)}`;
-	const starboardChannel = await resolveOnErrorCodes(interaction.guild!.channels.fetch(StarboardChannelId), RESTJSONErrorCodes.MissingAccess);
-
-	if (!starboardChannel?.isTextBased()) {
-		throw new UserError({
-			identifier: ErrorIdentifiers.StarboardChannelNotFound,
-			message: 'The starboard channel was not found.'
-		});
-	}
-
-	const alreadyPostedMessage = await container.prisma.starboardMessage.findFirst({
-		where: {
-			channelId: BigInt(interaction.channelId),
-			guildId: BigInt(interaction.guildId!),
-			messageId: BigInt(interaction.targetId!),
-			authorId: BigInt(interaction.targetMessage.author.id)
-		}
-	});
-
-	if (isNullish(alreadyPostedMessage)) {
-		return postMessage(interaction, starboardChannel, content, amountOfStarsForMessage);
+		await postMessage(channelId, guild.id, targetMessage, targetId, starboardChannel, content, amountOfStarsForMessage);
+		return null;
 	}
 
 	const discordMessage = await resolveOnErrorCodes(
@@ -124,11 +63,38 @@ export async function sendMessageToStarboard(interaction: MessageContextMenuComm
 		RESTJSONErrorCodes.MissingAccess
 	);
 
-	if (!isNullish(discordMessage)) {
-		await discordMessage.edit({ content });
+	if (isNullish(discordMessage)) {
+		return null;
 	}
 
-	return replySuccessfullyStarredMessage(interaction, amountOfStarsForMessage, discordMessage);
+	await discordMessage.edit({ content });
+	return discordMessage;
+}
+
+async function postMessage(
+	channelId: string,
+	guildId: string,
+	targetMessage: Message,
+	targetId: string,
+	starboardChannel: GuildTextBasedChannel,
+	content: string,
+	amountOfStarsForMessage: number
+) {
+	const messageOnStarboard = await starboardChannel.send({
+		content,
+		embeds: await buildEmbeds(targetMessage, amountOfStarsForMessage),
+		components: [buildLinkButtons(targetMessage, channelId, guildId)]
+	});
+
+	await container.prisma.starboardMessage.create({
+		data: {
+			channelId: BigInt(channelId),
+			guildId: BigInt(guildId),
+			snowflake: BigInt(messageOnStarboard.id),
+			authorId: BigInt(targetMessage.author.id),
+			messageId: BigInt(targetId)
+		}
+	});
 }
 
 export async function deleteMessageFromStarboard(interaction: MessageContextMenuCommandInteraction, amountOfStarsForMessage: number) {
@@ -245,46 +211,11 @@ function buildReplyComponents(...messages: [label: string, messageUrl: string][]
 	return actionRow;
 }
 
-async function postMessage(
-	interaction: MessageContextMenuCommandInteraction,
-	starboardChannel: GuildTextBasedChannel,
-	content: string,
-	amountOfStarsForMessage: number
-) {
-	const messageOnStarboard = await starboardChannel.send({
-		content,
-		embeds: await buildEmbeds(interaction, amountOfStarsForMessage),
-		components: [buildLinkButtons(interaction)]
-	});
-
-	await container.prisma.starboardMessage.create({
-		data: {
-			channelId: BigInt(interaction.channelId),
-			guildId: BigInt(interaction.guildId!),
-			snowflake: BigInt(messageOnStarboard.id),
-			authorId: BigInt(interaction.targetMessage.author.id),
-			messageId: BigInt(interaction.targetId!)
-		}
-	});
-
-	const starEmoji = getStarEmojiForAmount(amountOfStarsForMessage);
-	const starPluralized = getStarPluralizedString(amountOfStarsForMessage);
-	const msgUrl = interaction.targetMessage.url;
-	const starboardChannelMention = channelMention(StarboardChannelId);
-	const embeddedMsgLink = hyperlink('message', hideLinkEmbed(msgUrl));
-
-	return interaction.reply({
-		content: `Woop! You just starred a ${embeddedMsgLink}! It now has ${starEmoji} ${amountOfStarsForMessage} ${starPluralized}.\nThis means it has passed the threshold, so I have added it to the ${starboardChannelMention}.`,
-		components: [buildReplyComponents(['Starred message', interaction.targetMessage.url], ['Starboard message', messageOnStarboard.url])],
-		ephemeral: true
-	});
-}
-
-async function buildEmbeds(interaction: MessageContextMenuCommandInteraction, amountOfStarsForMessage: number) {
-	const embedOfStarredMessage = buildEmbed({ message: interaction.targetMessage, amountOfStarsForMessage });
+async function buildEmbeds(targetMessage: Message, amountOfStarsForMessage: number) {
+	const embedOfStarredMessage = buildEmbed({ message: targetMessage, amountOfStarsForMessage });
 	const embeds: EmbedBuilder[] = [embedOfStarredMessage];
 
-	await addReferencedEmbedToEmbeds(interaction.targetMessage, embeds);
+	await addReferencedEmbedToEmbeds(targetMessage, embeds);
 
 	return embeds;
 }
@@ -357,27 +288,27 @@ async function addReferencedEmbedToEmbeds(message: MessageContextMenuCommandInte
 	}
 }
 
-function buildLinkButtons(interaction: MessageContextMenuCommandInteraction) {
+function buildLinkButtons(targetMessage: Message, channelId: string, guildId: string) {
 	const actionRow = new ActionRowBuilder<ButtonBuilder>();
 
 	const originalMessageButton = new ButtonBuilder() //
 		.setLabel('Original Message')
-		.setURL(getMessageUrl(interaction.targetMessage))
+		.setURL(getMessageUrl(targetMessage))
 		.setStyle(ButtonStyle.Link);
 
 	actionRow.addComponents(originalMessageButton);
 
 	if (
-		interaction.targetMessage.reference &&
-		interaction.targetMessage.reference.messageId &&
-		interaction.targetMessage.reference.channelId &&
-		interaction.targetMessage.reference.guildId &&
-		interaction.targetMessage.reference.channelId === interaction.channelId &&
-		interaction.targetMessage.reference.guildId === interaction.guildId
+		targetMessage.reference &&
+		targetMessage.reference.messageId &&
+		targetMessage.reference.channelId &&
+		targetMessage.reference.guildId &&
+		targetMessage.reference.channelId === channelId &&
+		targetMessage.reference.guildId === guildId
 	) {
 		const referencedMessageButton = new ButtonBuilder() //
 			.setLabel('First Referenced Message')
-			.setURL(getMessageUrl(interaction.targetMessage, true))
+			.setURL(getMessageUrl(targetMessage, true))
 			.setStyle(ButtonStyle.Link);
 
 		actionRow.addComponents(referencedMessageButton);

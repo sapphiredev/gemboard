@@ -5,7 +5,7 @@ import { getGuildIds } from '#utils/utils';
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command, UserError } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
-import { ApplicationCommandType, type MessageContextMenuCommandInteraction } from 'discord.js';
+import { ApplicationCommandType, Message, type MessageContextMenuCommandInteraction } from 'discord.js';
 
 @ApplyOptions<Command.Options>({
 	preconditions: ['IsMessageContextMenuCommand', 'NoSelfStar', 'NoBotStar', 'ValidServer', 'ValidChannel']
@@ -74,10 +74,17 @@ export class SlashCommand extends Command {
 
 		const amountOfStarsForMessage = await this.container.prisma.userMessage.count({ where: { messageId: messageToStar } });
 
+		let editedStarboardMessage: Message<true> | null = null;
 		if (amountOfStarsForMessage >= StarboardThreshold) {
-			return sendMessageToStarboard(interaction, amountOfStarsForMessage);
+			editedStarboardMessage = await sendMessageToStarboard(
+				interaction.channelId,
+				interaction.guild!,
+				interaction.targetId,
+				interaction.targetMessage,
+				amountOfStarsForMessage
+			);
 		}
 
-		return replySuccessfullyStarredMessage(interaction, amountOfStarsForMessage);
+		return replySuccessfullyStarredMessage(interaction, amountOfStarsForMessage, editedStarboardMessage);
 	}
 }
