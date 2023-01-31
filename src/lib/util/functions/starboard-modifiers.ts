@@ -97,8 +97,16 @@ async function postMessage(
 	});
 }
 
-export async function deleteMessageFromStarboard(interaction: MessageContextMenuCommandInteraction, amountOfStarsForMessage: number) {
-	const starboardChannel = await resolveOnErrorCodes(interaction.guild!.channels.fetch(StarboardChannelId), RESTJSONErrorCodes.MissingAccess);
+/**
+ * Deletes the message from the starboard if it exists
+ * @param channelId The channel id of the message that was starred
+ * @param guild The guild that the message was starred in
+ * @param targetId The id of the message that was starred
+ * @param targetMessage The message that was starred
+ * @returns `true` if by unstarring the message dropped below the threshold and the message was deleted, `false` otherwise
+ */
+export async function deleteMessageFromStarboard(channelId: string, guild: Guild, targetId: string, targetMessage: Message) {
+	const starboardChannel = await resolveOnErrorCodes(guild.channels.fetch(StarboardChannelId), RESTJSONErrorCodes.MissingAccess);
 
 	if (!starboardChannel?.isTextBased()) {
 		throw new UserError({
@@ -109,26 +117,26 @@ export async function deleteMessageFromStarboard(interaction: MessageContextMenu
 
 	const alreadyPostedMessage = await container.prisma.starboardMessage.findFirst({
 		where: {
-			channelId: BigInt(interaction.channelId),
-			guildId: BigInt(interaction.guildId!),
-			messageId: BigInt(interaction.targetId!),
-			authorId: BigInt(interaction.targetMessage.author.id)
+			channelId: BigInt(channelId),
+			guildId: BigInt(guild.id),
+			messageId: BigInt(targetId!),
+			authorId: BigInt(targetMessage.author.id)
 		}
 	});
 
 	if (isNullish(alreadyPostedMessage)) {
 		// The message that was unstarred was never on the starboard to begin with
-		return replySuccessfullyUnstarredMessage(interaction, amountOfStarsForMessage);
+		return false;
 	}
 
 	const deletedStarboardMessageEntry = await container.prisma.starboardMessage.delete({
 		where: {
 			snowflake_authorId_channelId_guildId_messageId: {
-				channelId: BigInt(interaction.channelId),
-				guildId: BigInt(interaction.guildId!),
+				channelId: BigInt(channelId),
+				guildId: BigInt(guild.id),
 				snowflake: alreadyPostedMessage.snowflake,
 				authorId: alreadyPostedMessage.authorId,
-				messageId: BigInt(interaction.targetId!)
+				messageId: BigInt(targetId)
 			}
 		}
 	});
@@ -143,7 +151,7 @@ export async function deleteMessageFromStarboard(interaction: MessageContextMenu
 		await discordMessage.delete();
 	}
 
-	return replySuccessfullyUnstarredMessage(interaction, amountOfStarsForMessage, true);
+	return true;
 }
 
 export function replySuccessfullyStarredMessage(
@@ -170,7 +178,7 @@ export function replySuccessfullyStarredMessage(
 	});
 }
 
-function replySuccessfullyUnstarredMessage(
+export function replySuccessfullyUnstarredMessage(
 	interaction: MessageContextMenuCommandInteraction,
 	amountOfStarsForMessage: number,
 	droppedBelowThreshold = false
