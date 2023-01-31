@@ -1,7 +1,7 @@
-import { BrandingColors } from '#utils/constants';
+import { bannedCommandChannels, bannedStarChannels, BrandingColors } from '#utils/constants';
 import { isNullish, tryParseURL } from '@sapphire/utilities';
 import { envParseString } from '@skyra/env-utilities';
-import { DiscordAPIError, formatEmoji, MessageReaction, RESTJSONErrorCodes, User } from 'discord.js';
+import { DiscordAPIError, formatEmoji, Message, MessageReaction, RESTJSONErrorCodes, User } from 'discord.js';
 
 export function getStarEmojiForAmount(amountOfStarsForMessage: number): string {
 	if (amountOfStarsForMessage <= 10) return '⭐';
@@ -59,7 +59,7 @@ export function extractImageUrl(content: string): ExtractImageUrl | undefined {
 	};
 }
 
-export function messageReactionListenerPreflightChecks(messageReaction: MessageReaction, user: User) {
+export function messageReactionListenerPreflightChecks(messageReaction: MessageReaction, user: User, message: Message) {
 	// Bypass reactions that are not a star
 	if (messageReaction.emoji.name !== '⭐') return true;
 
@@ -67,13 +67,16 @@ export function messageReactionListenerPreflightChecks(messageReaction: MessageR
 	if (user.bot) return true;
 
 	// If there is no message author then return
-	if (!messageReaction.message.author) return true;
+	if (!message.author) return true;
 
 	// Prevent users from self-starring
-	if (user.id === messageReaction.message.author.id) return true;
+	if (user.id === message.author.id) return true;
 
 	// Prevent reactions in unverified of the server
-	if (messageReaction.message.guildId !== envParseString('COMMAND_GUILD_ID')) return true;
+	if (message.guildId !== envParseString('COMMAND_GUILD_ID')) return true;
+
+	// Prevent reactions in banned channels
+	if (bannedCommandChannels.has(message.channelId) || bannedStarChannels.has(message.channelId)) return true;
 
 	return false;
 }

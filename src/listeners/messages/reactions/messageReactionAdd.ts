@@ -1,19 +1,18 @@
-import { bannedCommandChannels, bannedStarChannels, ErrorIdentifiers, StarboardThreshold } from '#utils/constants';
-import { getStarEmojiForAmount, getStarPluralizedString, messageReactionListenerPreflightChecks } from '#utils/functions/helpers';
+import { ErrorIdentifiers, StarboardThreshold } from '#utils/constants';
+import { messageReactionListenerPreflightChecks } from '#utils/functions/helpers';
+import { sendMessageToStarboard } from '#utils/functions/starboard-modifiers';
 import { Events, Listener, UserError } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
-import { envParseString } from '@skyra/env-utilities';
-import { MessageReaction, User } from 'discord.js';
+import type { MessageReaction, User } from 'discord.js';
 
 export class UserListener extends Listener<typeof Events.MessageReactionAdd> {
 	public async run(messageReaction: MessageReaction, user: User) {
-		if (messageReactionListenerPreflightChecks(messageReaction, user)) return;
+		const targetMessage = await messageReaction.message.fetch();
 
-		// Prevent reactions in banned channels
-		if (bannedCommandChannels.has(messageReaction.message.channelId) || bannedStarChannels.has(messageReaction.message.channelId)) return;
+		if (messageReactionListenerPreflightChecks(messageReaction, user, targetMessage)) return;
 
-		const messageToStar = BigInt(messageReaction.message.id);
-		const userWhoStarred = BigInt(messageReaction.message.author!.id);
+		const messageToStar = BigInt(targetMessage.id);
+		const userWhoStarred = BigInt(targetMessage.author.id);
 
 		let userFromDatabase = await this.container.prisma.user.findFirst({ where: { snowflake: userWhoStarred } });
 
@@ -62,7 +61,7 @@ export class UserListener extends Listener<typeof Events.MessageReactionAdd> {
 		const amountOfStarsForMessage = await this.container.prisma.userMessage.count({ where: { messageId: messageToStar } });
 
 		if (amountOfStarsForMessage >= StarboardThreshold) {
-			return sendMessageToStarboard(interaction, amountOfStarsForMessage);
+			await sendMessageToStarboard(targetMessage.channelId, targetMessage.guild!, targetMessage.id, targetMessage, amountOfStarsForMessage);
 		}
 	}
 }
