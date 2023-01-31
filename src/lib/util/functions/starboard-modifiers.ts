@@ -21,7 +21,6 @@ import {
 	Message,
 	messageLink,
 	RESTJSONErrorCodes,
-	userMention,
 	type GuildTextBasedChannel,
 	type MessageContextMenuCommandInteraction
 } from 'discord.js';
@@ -120,7 +119,6 @@ export function replySuccessfullyStarredMessage(
 	const starEmoji = getStarEmojiForAmount(amountOfStarsForMessage);
 	const starPluralized = getStarPluralizedString(amountOfStarsForMessage);
 
-	const authorMention = userMention(interaction.user.id);
 	const msgUrl = interaction.targetMessage.url;
 	const embeddedMsgLink = hyperlink('message', hideLinkEmbed(msgUrl));
 
@@ -131,8 +129,9 @@ export function replySuccessfullyStarredMessage(
 	}
 
 	return interaction.reply({
-		content: `${authorMention} just starred a ${embeddedMsgLink}! It now has ${starEmoji} ${amountOfStarsForMessage} ${starPluralized}.`,
-		components: [buildReplyComponents(...componentMessageLinks)]
+		content: `You just starred a ${embeddedMsgLink}! It now has ${starEmoji} ${amountOfStarsForMessage} ${starPluralized}.`,
+		components: [buildReplyComponents(...componentMessageLinks)],
+		ephemeral: true
 	});
 }
 
@@ -141,14 +140,14 @@ function replySuccessfullyUnstarredMessage(
 	amountOfStarsForMessage: number,
 	droppedBelowThreshold = false
 ) {
-	const authorMention = userMention(interaction.user.id);
 	const msgUrl = interaction.targetMessage.url;
 	const embeddedMsgLink = hyperlink('message', hideLinkEmbed(msgUrl));
 
 	if (droppedBelowThreshold) {
 		return interaction.reply({
-			content: `Awe shucks, ${authorMention} removed their star from a ${embeddedMsgLink}.\nThis dropped the ${embeddedMsgLink} below the threshold of ${StarboardThreshold} so I have deleted the ${embeddedMsgLink} from the starboard.`,
-			components: [buildReplyComponents(['Go to message', interaction.targetMessage.url])]
+			content: `Awe shucks, you removed your star from a ${embeddedMsgLink}.\nThis dropped the ${embeddedMsgLink} below the threshold of ${StarboardThreshold} so I have deleted the ${embeddedMsgLink} from the starboard.`,
+			components: [buildReplyComponents(['Go to message', interaction.targetMessage.url])],
+			ephemeral: true
 		});
 	}
 
@@ -156,8 +155,9 @@ function replySuccessfullyUnstarredMessage(
 	const starPluralized = getStarPluralizedString(amountOfStarsForMessage);
 
 	return interaction.reply({
-		content: `Oh noes, ${authorMention} removed their star from a ${embeddedMsgLink}. The ${embeddedMsgLink} now has ${starEmoji} ${amountOfStarsForMessage} ${starPluralized}.`,
-		components: [buildReplyComponents(['Go to message', interaction.targetMessage.url])]
+		content: `Oh noes, you removed your star from a ${embeddedMsgLink}. The ${embeddedMsgLink} now has ${starEmoji} ${amountOfStarsForMessage} ${starPluralized}.`,
+		components: [buildReplyComponents(['Go to message', interaction.targetMessage.url])],
+		ephemeral: true
 	});
 }
 
@@ -200,14 +200,14 @@ async function postMessage(
 
 	const starEmoji = getStarEmojiForAmount(amountOfStarsForMessage);
 	const starPluralized = getStarPluralizedString(amountOfStarsForMessage);
-	const authorMention = userMention(interaction.user.id);
 	const msgUrl = interaction.targetMessage.url;
 	const starboardChannelMention = channelMention(StarboardChannelId);
 	const embeddedMsgLink = hyperlink('message', hideLinkEmbed(msgUrl));
 
 	return interaction.reply({
-		content: `Woop! ${authorMention} just starred a ${embeddedMsgLink}! It now has ${starEmoji} ${amountOfStarsForMessage} ${starPluralized}.\nThis means it has passed the threshold, so I have added it to the ${starboardChannelMention}.`,
-		components: [buildReplyComponents(['Starred message', interaction.targetMessage.url], ['Starboard message', messageOnStarboard.url])]
+		content: `Woop! You just starred a ${embeddedMsgLink}! It now has ${starEmoji} ${amountOfStarsForMessage} ${starPluralized}.\nThis means it has passed the threshold, so I have added it to the ${starboardChannelMention}.`,
+		components: [buildReplyComponents(['Starred message', interaction.targetMessage.url], ['Starboard message', messageOnStarboard.url])],
+		ephemeral: true
 	});
 }
 
