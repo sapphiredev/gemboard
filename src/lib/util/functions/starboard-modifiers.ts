@@ -16,14 +16,83 @@ import {
 	ButtonStyle,
 	channelMention,
 	EmbedBuilder,
+	Guild,
 	hideLinkEmbed,
 	hyperlink,
 	Message,
 	messageLink,
+	MessageReaction,
 	RESTJSONErrorCodes,
 	type GuildTextBasedChannel,
 	type MessageContextMenuCommandInteraction
 } from 'discord.js';
+
+export async function sendMessageToStarboard2(
+	channelId: string,
+	guild: Guild,
+	targetId: string,
+	targetMessage: Message,
+	amountOfStarsForMessage: number
+) {
+	const content = `${getStarEmojiForAmount(amountOfStarsForMessage)} **${amountOfStarsForMessage}** | ${channelMention(channelId)}`;
+	const starboardChannel = await resolveOnErrorCodes(guild.channels.fetch(StarboardChannelId), RESTJSONErrorCodes.MissingAccess);
+
+	if (!starboardChannel?.isTextBased()) {
+		throw new UserError({
+			identifier: ErrorIdentifiers.StarboardChannelNotFound,
+			message: 'The starboard channel was not found.'
+		});
+	}
+
+	const alreadyPostedMessage = await container.prisma.starboardMessage.findFirst({
+		where: {
+			channelId: BigInt(channelId),
+			guildId: BigInt(guild.id),
+			messageId: BigInt(targetId),
+			authorId: BigInt(targetMessage.author.id)
+		}
+	});
+
+	if (isNullish(alreadyPostedMessage)) {
+		await postMessage2(channelId, guild.id, targetMessage.author.id, targetId, starboardChannel, content, amountOfStarsForMessage);
+	} else {
+		const discordMessage = await resolveOnErrorCodes(
+			starboardChannel.messages.fetch(alreadyPostedMessage.snowflake.toString()),
+			RESTJSONErrorCodes.UnknownMessage,
+			RESTJSONErrorCodes.MissingAccess
+		);
+
+		if (!isNullish(discordMessage)) {
+			await discordMessage.edit({ content });
+		}
+	}
+}
+
+async function postMessage2(
+	channelId: string,
+	guildId: string,
+	targetMessageAuthorId: string,
+	targetId: string,
+	starboardChannel: GuildTextBasedChannel,
+	content: string,
+	amountOfStarsForMessage: number
+) {
+	const messageOnStarboard = await starboardChannel.send({
+		content,
+		embeds: await buildEmbeds(interaction, amountOfStarsForMessage),
+		components: [buildLinkButtons(interaction)]
+	});
+
+	await container.prisma.starboardMessage.create({
+		data: {
+			channelId: BigInt(channelId),
+			guildId: BigInt(guildId),
+			snowflake: BigInt(messageOnStarboard.id),
+			authorId: BigInt(targetMessageAuthorId),
+			messageId: BigInt(targetId)
+		}
+	});
+}
 
 export async function sendMessageToStarboard(interaction: MessageContextMenuCommandInteraction, amountOfStarsForMessage: number) {
 	const content = `${getStarEmojiForAmount(amountOfStarsForMessage)} **${amountOfStarsForMessage}** | ${channelMention(interaction.channelId)}`;

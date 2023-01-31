@@ -1,6 +1,7 @@
 import { BrandingColors } from '#utils/constants';
 import { isNullish, tryParseURL } from '@sapphire/utilities';
-import { DiscordAPIError, formatEmoji, RESTJSONErrorCodes } from 'discord.js';
+import { envParseString } from '@skyra/env-utilities';
+import { DiscordAPIError, formatEmoji, MessageReaction, RESTJSONErrorCodes, User } from 'discord.js';
 
 export function getStarEmojiForAmount(amountOfStarsForMessage: number): string {
 	if (amountOfStarsForMessage <= 10) return '⭐';
@@ -56,6 +57,25 @@ export function extractImageUrl(content: string): ExtractImageUrl | undefined {
 		imageUrl: getImageUrl(match),
 		contentWithoutImageUrl: content.replace(new RegExp(`${match} ?`), '')
 	};
+}
+
+export function messageReactionListenerPreflightChecks(messageReaction: MessageReaction, user: User) {
+	// Bypass reactions that are not a star
+	if (messageReaction.emoji.name !== '⭐') return true;
+
+	// Prevent bots from starring
+	if (user.bot) return true;
+
+	// If there is no message author then return
+	if (!messageReaction.message.author) return true;
+
+	// Prevent users from self-starring
+	if (user.id === messageReaction.message.author.id) return true;
+
+	// Prevent reactions in unverified of the server
+	if (messageReaction.message.guildId !== envParseString('COMMAND_GUILD_ID')) return true;
+
+	return false;
 }
 
 interface ExtractImageUrl {
