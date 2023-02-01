@@ -5,7 +5,7 @@ import { getGuildIds } from '#utils/utils';
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command, UserError } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
-import { ApplicationCommandType, type MessageContextMenuCommandInteraction } from 'discord.js';
+import { ApplicationCommandType, type Message, type MessageContextMenuCommandInteraction } from 'discord.js';
 
 @ApplyOptions<Command.Options>({
 	preconditions: ['IsMessageContextMenuCommand', 'NoSelfStar', 'NoBotStar', 'ValidServer', 'ValidChannel']
@@ -26,11 +26,11 @@ export class SlashCommand extends Command {
 		const messageToStar = BigInt(interaction.targetId);
 		const userWhoStarred = BigInt(interaction.user.id);
 
-		let userFromDatabase = await this.container.prisma.user.findFirst({ where: { snowflake: userWhoStarred } });
-
-		if (isNullish(userFromDatabase)) {
-			userFromDatabase = await this.container.prisma.user.create({ data: { snowflake: userWhoStarred } });
-		}
+		await this.container.prisma.user.upsert({
+			create: { snowflake: userWhoStarred },
+			update: { snowflake: userWhoStarred },
+			where: { snowflake: userWhoStarred }
+		});
 
 		const messageFromDatabase = await this.container.prisma.message.findFirst({ where: { snowflake: messageToStar } });
 
@@ -74,10 +74,17 @@ export class SlashCommand extends Command {
 
 		const amountOfStarsForMessage = await this.container.prisma.userMessage.count({ where: { messageId: messageToStar } });
 
+		let editedStarboardMessage: Message<true> | null = null;
 		if (amountOfStarsForMessage >= StarboardThreshold) {
-			return sendMessageToStarboard(interaction, amountOfStarsForMessage);
+			editedStarboardMessage = await sendMessageToStarboard(
+				interaction.channelId,
+				interaction.guild!,
+				interaction.targetId,
+				interaction.targetMessage,
+				amountOfStarsForMessage
+			);
 		}
 
-		return replySuccessfullyStarredMessage(interaction, amountOfStarsForMessage);
+		return replySuccessfullyStarredMessage(interaction, amountOfStarsForMessage, editedStarboardMessage);
 	}
 }

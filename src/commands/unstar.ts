@@ -1,5 +1,10 @@
 import { ErrorIdentifiers, StarboardThreshold } from '#utils/constants';
-import { deleteMessageFromStarboard, sendMessageToStarboard } from '#utils/functions/starboard-modifiers';
+import {
+	deleteMessageFromStarboard,
+	replySuccessfullyStarredMessage,
+	replySuccessfullyUnstarredMessage,
+	sendMessageToStarboard
+} from '#utils/functions/starboard-modifiers';
 import { getGuildIds } from '#utils/utils';
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command, UserError } from '@sapphire/framework';
@@ -69,7 +74,14 @@ export class SlashCommand extends Command {
 		const amountOfStarsForMessage = await this.container.prisma.userMessage.count({ where: { messageId: messageToUnStar } });
 
 		if (amountOfStarsForMessage >= StarboardThreshold) {
-			return sendMessageToStarboard(interaction, amountOfStarsForMessage);
+			const editedStarboardMessage = await sendMessageToStarboard(
+				interaction.channelId,
+				interaction.guild!,
+				interaction.targetId,
+				interaction.targetMessage,
+				amountOfStarsForMessage
+			);
+			return replySuccessfullyStarredMessage(interaction, amountOfStarsForMessage, editedStarboardMessage);
 		} else if (amountOfStarsForMessage === 0) {
 			await this.container.prisma.message.delete({ where: { snowflake: messageToUnStar } });
 		}
@@ -80,6 +92,12 @@ export class SlashCommand extends Command {
 			await this.container.prisma.user.delete({ where: { snowflake: userWhoUnStarred } });
 		}
 
-		return deleteMessageFromStarboard(interaction, amountOfStarsForMessage);
+		const starboardMessageWasDeleted = await deleteMessageFromStarboard(
+			interaction.channelId,
+			interaction.guild!,
+			interaction.targetId,
+			interaction.targetMessage
+		);
+		return replySuccessfullyUnstarredMessage(interaction, amountOfStarsForMessage, starboardMessageWasDeleted);
 	}
 }

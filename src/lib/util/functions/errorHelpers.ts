@@ -22,7 +22,7 @@ import {
 	type CommandInteraction
 } from 'discord.js';
 
-const ignoredCodes = [RESTJSONErrorCodes.UnknownChannel, RESTJSONErrorCodes.UnknownMessage];
+export const ignoredCodes = [RESTJSONErrorCodes.UnknownChannel, RESTJSONErrorCodes.UnknownMessage];
 
 export async function handleChatInputOrContextMenuCommandError(
 	error: Error,
@@ -62,7 +62,7 @@ export async function handleChatInputOrContextMenuCommandError(
 	return undefined;
 }
 
-function generateUnexpectedErrorMessage(error: Error) {
+export function generateUnexpectedErrorMessage(error: Error) {
 	return [
 		`I found an unexpected error, please report the steps you have taken to ${OwnerMentions}!`,
 		'',
