@@ -26,11 +26,11 @@ export class SlashCommand extends Command {
 		const messageToStar = BigInt(interaction.targetId);
 		const userWhoStarred = BigInt(interaction.user.id);
 
-		let userFromDatabase = await this.container.prisma.user.findFirst({ where: { snowflake: userWhoStarred } });
-
-		if (isNullish(userFromDatabase)) {
-			userFromDatabase = await this.container.prisma.user.create({ data: { snowflake: userWhoStarred } });
-		}
+		await this.container.prisma.user.upsert({
+			create: { snowflake: userWhoStarred },
+			update: { snowflake: userWhoStarred },
+			where: { snowflake: userWhoStarred }
+		});
 
 		const messageFromDatabase = await this.container.prisma.message.findFirst({ where: { snowflake: messageToStar } });
 

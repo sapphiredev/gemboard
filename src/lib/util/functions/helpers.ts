@@ -75,7 +75,7 @@ export function messageReactionListenerPreflightChecks(messageReaction: MessageR
 	// Prevent users from self-starring
 	if (user.id === message.author.id) return true;
 
-	// Prevent reactions in unverified of the server
+	// Prevent reactions in unverified servers
 	if (message.guildId !== envParseString('COMMAND_GUILD_ID')) return true;
 
 	// Prevent reactions in banned channels

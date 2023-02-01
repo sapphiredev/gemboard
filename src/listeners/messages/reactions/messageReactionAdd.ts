@@ -2,7 +2,7 @@ import { StarboardThreshold } from '#utils/constants';
 import { messageReactionListenerPreflightChecks } from '#utils/functions/helpers';
 import { sendMessageToStarboard } from '#utils/functions/starboard-modifiers';
 import { ApplyOptions } from '@sapphire/decorators';
-import { Events, Listener } from '@sapphire/framework';
+import { Events, Listener, Result } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
 import type { MessageReaction, PartialMessageReaction, User } from 'discord.js';
 
@@ -19,11 +19,11 @@ export class UserListener extends Listener<typeof Events.MessageReactionAdd> {
 		const messageToStar = BigInt(targetMessage.id);
 		const userWhoStarred = BigInt(user.id);
 
-		let userFromDatabase = await this.container.prisma.user.findFirst({ where: { snowflake: userWhoStarred } });
-
-		if (isNullish(userFromDatabase)) {
-			userFromDatabase = await this.container.prisma.user.create({ data: { snowflake: userWhoStarred } });
-		}
+		await this.container.prisma.user.upsert({
+			create: { snowflake: userWhoStarred },
+			update: { snowflake: userWhoStarred },
+			where: { snowflake: userWhoStarred }
+		});
 
 		const messageFromDatabase = await this.container.prisma.message.findFirst({ where: { snowflake: messageToStar } });
 
@@ -43,7 +43,7 @@ export class UserListener extends Listener<typeof Events.MessageReactionAdd> {
 					}
 				});
 			} else {
-				await messageReaction.remove();
+				await Result.fromAsync(messageReaction.remove());
 			}
 		} else {
 			await this.container.prisma.message.create({
