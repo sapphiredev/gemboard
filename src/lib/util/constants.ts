@@ -24,8 +24,6 @@ export const bannedCommandChannels = new Set([
 	// Sapphire
 	StarboardChannelId, // ⭐ Starboard
 	'737142021084413973', // Welcome!
-	'917524171150471178', // Get-A-Role!
-	'737142071319855105', // Announcements
 	'737455952332062808', // suggestions
 	'868616234571268186', // Mod Announcements
 	'749981849153044480', // Discord Community - Announcements
