@@ -51,6 +51,7 @@ export class UserListener extends Listener<typeof Events.MessageReactionRemove> 
 			await sendMessageToStarboard(targetMessage.channelId, targetMessage.guild!, targetMessage.id, targetMessage, amountOfStarsForMessage);
 		} else if (amountOfStarsForMessage === 0) {
 			await this.container.prisma.message.delete({ where: { snowflake: messageToUnStar } });
+			await deleteMessageFromStarboard(targetMessage.channelId, targetMessage.guild!, targetMessage.id, targetMessage);
 		}
 
 		const amountOfStarsByUser = await this.container.prisma.userMessage.count({ where: { userId: userWhoUnStarred } });
@@ -58,7 +59,5 @@ export class UserListener extends Listener<typeof Events.MessageReactionRemove> 
 		if (amountOfStarsByUser === 0) {
 			await this.container.prisma.user.delete({ where: { snowflake: userWhoUnStarred } });
 		}
-
-		await deleteMessageFromStarboard(targetMessage.channelId, targetMessage.guild!, targetMessage.id, targetMessage);
 	}
 }
