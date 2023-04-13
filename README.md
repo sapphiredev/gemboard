@@ -1,6 +1,6 @@
 <div align="center">
 
-<img height="200" src="https://cdn.skyra.pw/gh-assets/sapphire-banner.png" alt="Gemboard"/>
+<img height="200" src="https://raw.githubusercontent.com/sapphiredev/assets/main/banners/SapphireCommunity.png" alt="Gemboard"/>
 
 # Gemboard
 
