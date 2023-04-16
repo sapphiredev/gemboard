@@ -32,7 +32,7 @@
 		"@sapphire/plugin-logger": "^3.0.2",
 		"@sapphire/utilities": "^3.11.0",
 		"@skyra/env-utilities": "^1.1.0",
-		"@skyra/start-banner": "^1.0.2",
+		"@skyra/start-banner": "^2.0.0",
 		"bufferutil": "^4.0.7",
 		"colorette": "^2.0.19",
 		"discord.js": "^14.9.0",
