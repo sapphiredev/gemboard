@@ -3,16 +3,16 @@ import { BrandingColors, ErrorIdentifiers } from '#utils/constants';
 import { getStarEmojiForAmount } from '#utils/functions/helpers';
 import { getGuildIds } from '#utils/utils';
 import { ApplyOptions } from '@sapphire/decorators';
-import { ChatInputCommand, Command, Result, UserError } from '@sapphire/framework';
+import { Command, Result, UserError } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
-import { bold, EmbedBuilder, userMention } from 'discord.js';
+import { EmbedBuilder, bold, userMention } from 'discord.js';
 
-@ApplyOptions<ChatInputCommand.Options>({
+@ApplyOptions<Command.Options>({
 	preconditions: ['ValidServer', 'ValidCommandChannel'],
 	description: 'Gets the leaderboard of users who most starred messages.'
 })
 export class SlashCommand extends Command {
-	public override registerApplicationCommands(registry: ChatInputCommand.Registry) {
+	public override registerApplicationCommands(registry: Command.Registry) {
 		registry.registerChatInputCommand(
 			(builder) =>
 				builder //
@@ -22,7 +22,7 @@ export class SlashCommand extends Command {
 		);
 	}
 
-	public override async chatInputRun(interaction: ChatInputCommand.Interaction) {
+	public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
 		const starboardLeaderboardResult = await Result.fromAsync(
 			() => this.container.prisma.$queryRaw<StarboardLeaderboard[]>`
 				SELECT COUNT(sbm.author_id) as star_count, sbm.author_id

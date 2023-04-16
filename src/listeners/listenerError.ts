@@ -1,7 +1,7 @@
 import { Owners } from '#root/config';
 import { generateUnexpectedErrorMessage, ignoredCodes } from '#utils/functions/errorHelpers';
 import { resolveOnErrorCodes } from '#utils/functions/helpers';
-import { Events, Listener, ListenerErrorPayload, Piece, UserError } from '@sapphire/framework';
+import { Events, Listener, type ListenerErrorPayload, Piece, UserError } from '@sapphire/framework';
 import { envParseString } from '@skyra/env-utilities';
 import { DiscordAPIError, HTTPError, RESTJSONErrorCodes } from 'discord.js';
 
