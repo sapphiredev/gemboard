@@ -22,7 +22,7 @@ export const StarboardThreshold = process.env.NODE_ENV === 'development' ? 2 : 3
 
 export const bannedCommandChannels = new Set([
 	// Sapphire
-	StarboardChannelId, // ⭐ Starboard
+	StarboardChannelId, // starboard
 	'737142021084413973', // Welcome!
 	'737455952332062808', // suggestions
 	'868616234571268186', // Mod Announcements
