@@ -27,7 +27,7 @@
 		"postinstall": "husky install .github/husky"
 	},
 	"dependencies": {
-		"@prisma/client": "^4.16.2",
+		"@prisma/client": "^5.1.1",
 		"@sapphire/decorators": "^6.0.2",
 		"@sapphire/framework": "^4.5.1",
 		"@sapphire/plugin-logger": "^3.0.5",
@@ -64,7 +64,7 @@
 		"lint-staged": "^13.2.3",
 		"prettier": "^3.0.0",
 		"prettier-plugin-prisma": "^5.0.0",
-		"prisma": "^4.16.2",
+		"prisma": "^5.1.1",
 		"rimraf": "^5.0.1",
 		"tsup": "^7.1.0",
 		"typescript": "^5.1.6"
