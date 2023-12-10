@@ -29,7 +29,7 @@
 		"@prisma/client": "^5.7.0",
 		"@sapphire/decorators": "^6.0.3",
 		"@sapphire/framework": "^4.8.5",
-		"@sapphire/plugin-logger": "^3.0.7",
+		"@sapphire/plugin-logger": "^4.0.1",
 		"@sapphire/utilities": "^3.14.0",
 		"@skyra/env-utilities": "^1.2.1",
 		"@skyra/start-banner": "^2.0.0",
