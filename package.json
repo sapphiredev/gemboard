@@ -28,7 +28,7 @@
 	"dependencies": {
 		"@prisma/client": "^5.7.0",
 		"@sapphire/decorators": "^6.0.3",
-		"@sapphire/framework": "^4.8.5",
+		"@sapphire/framework": "^5.0.4",
 		"@sapphire/plugin-logger": "^3.0.7",
 		"@sapphire/utilities": "^3.14.0",
 		"@skyra/env-utilities": "^1.2.1",
