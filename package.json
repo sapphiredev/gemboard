@@ -26,7 +26,7 @@
 		"dev": "tsup --watch --onSuccess \"yarn start\""
 	},
 	"dependencies": {
-		"@prisma/client": "^5.15.0",
+		"@prisma/client": "^5.15.1",
 		"@sapphire/decorators": "^6.1.0",
 		"@sapphire/framework": "^5.2.1",
 		"@sapphire/plugin-logger": "^4.0.2",
@@ -39,7 +39,7 @@
 		"figlet": "^1.7.0",
 		"gradient-string": "^2.0.2",
 		"utf-8-validate": "^6.0.4",
-		"ws": "^8.17.0",
+		"ws": "^8.17.1",
 		"zlib-sync": "^0.1.9"
 	},
 	"devDependencies": {
@@ -48,13 +48,13 @@
 		"@sapphire/eslint-config": "^5.0.5",
 		"@sapphire/prettier-config": "^2.0.0",
 		"@sapphire/ts-config": "^5.0.1",
-		"@swc/core": "^1.6.1",
+		"@swc/core": "^1.6.5",
 		"@types/figlet": "^1.5.8",
 		"@types/gradient-string": "^1.1.6",
 		"@types/node": "^20.14.2",
 		"@types/ws": "^8.5.10",
-		"@typescript-eslint/eslint-plugin": "^7.13.0",
-		"@typescript-eslint/parser": "^7.13.0",
+		"@typescript-eslint/eslint-plugin": "^7.13.1",
+		"@typescript-eslint/parser": "^7.13.1",
 		"cz-conventional-changelog": "^3.3.0",
 		"eslint": "^8.57.0",
 		"eslint-config-prettier": "^9.1.0",
@@ -62,10 +62,10 @@
 		"lint-staged": "^15.2.7",
 		"prettier": "^3.3.2",
 		"prettier-plugin-prisma": "^5.0.0",
-		"prisma": "^5.15.0",
+		"prisma": "^5.15.1",
 		"rimraf": "^5.0.7",
 		"tsup": "^8.1.0",
-		"typescript": "^5.4.5"
+		"typescript": "^5.5.2"
 	},
 	"engines": {
 		"node": ">=16.6.0",
@@ -93,5 +93,5 @@
 		}
 	},
 	"prettier": "@sapphire/prettier-config",
-	"packageManager": "yarn@4.3.0"
+	"packageManager": "yarn@4.3.1"
 }
