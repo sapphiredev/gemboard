@@ -16,9 +16,11 @@ jobs:
     uses: sapphiredev/.github/.github/workflows/reusable-yarn-job.yml@main
     with:
       script-name: prisma:generate && yarn typecheck
-      enable-sonar: true
+
+  sonar:
+    name: Sonar Analysis
+    uses: sapphiredev/.github/.github/workflows/reusable-sonar.yml@main
     secrets:
-      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   build:
