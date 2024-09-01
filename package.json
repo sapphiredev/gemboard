@@ -26,7 +26,7 @@
 		"dev": "tsup --watch --onSuccess \"yarn start\""
 	},
 	"dependencies": {
-		"@prisma/client": "^5.18.0",
+		"@prisma/client": "^5.19.0",
 		"@sapphire/decorators": "^6.1.0",
 		"@sapphire/framework": "^5.2.1",
 		"@sapphire/plugin-logger": "^4.0.2",
@@ -43,15 +43,15 @@
 		"zlib-sync": "^0.1.9"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "^19.4.0",
-		"@commitlint/config-conventional": "^19.2.2",
+		"@commitlint/cli": "^19.4.1",
+		"@commitlint/config-conventional": "^19.4.1",
 		"@sapphire/eslint-config": "^5.0.5",
 		"@sapphire/prettier-config": "^2.0.0",
 		"@sapphire/ts-config": "^5.0.1",
-		"@swc/core": "^1.7.18",
+		"@swc/core": "^1.7.22",
 		"@types/figlet": "^1.5.8",
 		"@types/gradient-string": "^1.1.6",
-		"@types/node": "^20.16.1",
+		"@types/node": "^20.16.2",
 		"@types/ws": "^8.5.12",
 		"@typescript-eslint/eslint-plugin": "^7.13.1",
 		"@typescript-eslint/parser": "^7.13.1",
@@ -62,7 +62,7 @@
 		"lint-staged": "^15.2.9",
 		"prettier": "^3.3.3",
 		"prettier-plugin-prisma": "^5.0.0",
-		"prisma": "^5.18.0",
+		"prisma": "^5.19.0",
 		"rimraf": "^6.0.1",
 		"tsup": "^8.2.4",
 		"typescript": "~5.4.5"
