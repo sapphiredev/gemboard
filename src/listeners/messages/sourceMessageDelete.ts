@@ -10,7 +10,7 @@ import { Message, RESTJSONErrorCodes } from 'discord.js';
 	event: Events.MessageDelete
 })
 export class UserListener extends Listener<typeof Events.MessageDelete> {
-	public async run(message: Message) {
+	public async run(message: Message<true>) {
 		if (message.guildId === envParseString('COMMAND_GUILD_ID')) return;
 		if (bannedStarChannels.has(message.channelId)) return;
 
