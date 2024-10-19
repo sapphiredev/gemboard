@@ -20,6 +20,7 @@ export class SlashCommand extends Command {
 			(builder) =>
 				builder //
 					.setName('Unstar Message')
+					// @ts-expect-error temporarily ignore the error because discord.js broke types
 					.setType(ApplicationCommandType.Message),
 
 			{ guildIds: getGuildIds() }
