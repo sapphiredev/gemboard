@@ -16,6 +16,7 @@ export class SlashCommand extends Command {
 			(builder) =>
 				builder //
 					.setName('Star Message')
+					// @ts-expect-error temporarily ignore the error because discord.js broke types
 					.setType(ApplicationCommandType.Message),
 
 			{ guildIds: getGuildIds() }
