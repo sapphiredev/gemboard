@@ -2,7 +2,7 @@
 #    Base Stage    #
 # ================ #
 
-FROM node:22-bullseye-slim as base
+FROM node:20-bullseye-slim AS base
 
 WORKDIR /usr/src/app
 
@@ -29,7 +29,7 @@ ENTRYPOINT ["dumb-init", "--"]
 #   Builder Stage  #
 # ================ #
 
-FROM base as builder
+FROM base AS builder
 
 ENV NODE_ENV="development"
 
