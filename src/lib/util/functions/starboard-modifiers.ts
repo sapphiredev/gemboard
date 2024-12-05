@@ -281,7 +281,7 @@ function buildEmbed({ message, amountOfStarsForMessage, isReferencedMessage = fa
 
 async function addReferencedEmbedToEmbeds(message: MessageContextMenuCommandInteraction['targetMessage'], embeds: EmbedBuilder[]) {
 	if (
-		embeds.length <= 10 &&
+		embeds.length <= 9 &&
 		message.reference &&
 		message.reference.messageId &&
 		message.reference.guildId &&
