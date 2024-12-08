@@ -26,7 +26,7 @@
 		"dev": "tsup --watch --onSuccess \"yarn start\""
 	},
 	"dependencies": {
-		"@prisma/client": "^6.0.0",
+		"@prisma/client": "^6.0.1",
 		"@sapphire/decorators": "^6.1.1",
 		"@sapphire/framework": "^5.3.1",
 		"@sapphire/plugin-logger": "^4.0.2",
@@ -48,7 +48,7 @@
 		"@sapphire/eslint-config": "^5.0.5",
 		"@sapphire/prettier-config": "^2.0.0",
 		"@sapphire/ts-config": "^5.0.1",
-		"@swc/core": "^1.9.3",
+		"@swc/core": "^1.10.0",
 		"@types/figlet": "^1.7.0",
 		"@types/gradient-string": "^1.1.6",
 		"@types/node": "^22.10.1",
@@ -60,9 +60,9 @@
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-prettier": "^5.2.1",
 		"lint-staged": "^15.2.10",
-		"prettier": "^3.4.1",
+		"prettier": "^3.4.2",
 		"prettier-plugin-prisma": "^5.0.0",
-		"prisma": "^6.0.0",
+		"prisma": "^6.0.1",
 		"rimraf": "^6.0.1",
 		"tsup": "^8.3.5",
 		"typescript": "~5.4.5"
