@@ -5,7 +5,7 @@ import { getGuildIds } from '#utils/utils';
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command, UserError } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
-import { ApplicationCommandType, type Message, type MessageContextMenuCommandInteraction } from 'discord.js';
+import { ApplicationCommandType, ApplicationIntegrationType, type Message, type MessageContextMenuCommandInteraction } from 'discord.js';
 
 @ApplyOptions<Command.Options>({
 	preconditions: ['IsMessageContextMenuCommand', 'NoSelfStar', 'NoBotStar', 'ValidServer', 'ValidChannel']
@@ -16,7 +16,7 @@ export class SlashCommand extends Command {
 			(builder) =>
 				builder //
 					.setName('Star Message')
-					// @ts-expect-error temporarily ignore the error because discord.js broke types
+					.setIntegrationTypes(ApplicationIntegrationType.GuildInstall)
 					.setType(ApplicationCommandType.Message),
 
 			{ guildIds: getGuildIds() }
