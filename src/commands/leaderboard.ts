@@ -5,7 +5,7 @@ import { getGuildIds } from '#utils/utils';
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command, Result, UserError } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
-import { EmbedBuilder, bold, userMention } from 'discord.js';
+import { ApplicationIntegrationType, EmbedBuilder, bold, userMention } from 'discord.js';
 
 @ApplyOptions<Command.Options>({
 	preconditions: ['ValidServer', 'ValidCommandChannel'],
@@ -17,6 +17,7 @@ export class SlashCommand extends Command {
 			(builder) =>
 				builder //
 					.setName(this.name)
+					.setIntegrationTypes(ApplicationIntegrationType.GuildInstall)
 					.setDescription(this.description),
 			{ guildIds: getGuildIds() }
 		);
