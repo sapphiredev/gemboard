@@ -51,7 +51,7 @@
 		"@swc/core": "^1.14.0",
 		"@types/figlet": "^1.7.0",
 		"@types/gradient-string": "^1.1.6",
-		"@types/node": "^22.18.13",
+		"@types/node": "^24.10.0",
 		"@types/ws": "^8.18.1",
 		"@typescript-eslint/eslint-plugin": "^7.18.0",
 		"@typescript-eslint/parser": "^7.18.0",
@@ -95,6 +95,6 @@
 	"prettier": "@sapphire/prettier-config",
 	"packageManager": "yarn@4.10.3",
 	"volta": {
-		"node": "22.21.1"
+		"node": "24.11.0"
 	}
 }
