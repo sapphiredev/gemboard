@@ -26,7 +26,7 @@
 		"dev": "tsup --watch --onSuccess \"yarn start\""
 	},
 	"dependencies": {
-		"@prisma/client": "^6.19.0",
+		"@prisma/client": "^7.0.1",
 		"@sapphire/decorators": "^6.2.0",
 		"@sapphire/framework": "^5.4.0",
 		"@sapphire/plugin-logger": "^4.1.0",
@@ -62,7 +62,7 @@
 		"lint-staged": "^16.2.6",
 		"prettier": "^3.6.2",
 		"prettier-plugin-prisma": "^5.0.0",
-		"prisma": "^6.19.0",
+		"prisma": "^7.0.1",
 		"rimraf": "^6.1.0",
 		"tsup": "^8.5.1",
 		"typescript": "~5.4.5"
