@@ -4,29 +4,30 @@
 	"description": "A private starboard bot for the Sapphire server.",
 	"author": "@sapphire",
 	"license": "MIT",
-	"main": "dist/gemboard.js",
+	"main": "dist/gemboard.mjs",
 	"private": true,
 	"type": "module",
 	"imports": {
-		"#lib/*": "./dist/lib/*.js",
-		"#root/*": "./dist/*.js",
-		"#utils/*": "./dist/lib/util/*.js",
-		"#lib/env": "./dist/lib/env/index.js"
+		"#lib/*": "./dist/lib/*.mjs",
+		"#root/*": "./dist/*.mjs",
+		"#utils/*": "./dist/lib/util/*.mjs",
+		"#lib/env": "./dist/lib/env/index.mjs"
 	},
 	"scripts": {
-		"start": "node --preserve-symlinks --enable-source-maps dist/gemboard.js",
+		"start": "node --preserve-symlinks --enable-source-maps dist/gemboard.mjs",
 		"lint": "eslint src --ext ts --fix",
 		"prettier": "prettier --ignore-path=.prettierignore",
 		"format": "prettier --write .",
 		"prisma:generate": "prisma generate",
-		"build": "tsup",
-		"watch": "tsup --watch",
+		"build": "tsdown",
+		"watch": "tsdown --watch",
 		"clean": "rimraf dist/",
 		"typecheck": "tsc -b src",
-		"dev": "tsup --watch --onSuccess \"yarn start\""
+		"dev": "tsdown --watch --onSuccess \"yarn start\""
 	},
 	"dependencies": {
-		"@prisma/client": "^6.19.0",
+		"@prisma/adapter-pg": "^7.0.1",
+		"@prisma/client": "^7.0.1",
 		"@sapphire/decorators": "^6.2.0",
 		"@sapphire/framework": "^5.4.0",
 		"@sapphire/plugin-logger": "^4.1.0",
@@ -39,19 +40,18 @@
 		"figlet": "^1.9.4",
 		"gradient-string": "^3.0.0",
 		"utf-8-validate": "^6.0.5",
-		"ws": "^8.18.3",
-		"zlib-sync": "^0.1.10"
+		"ws": "^8.18.3"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^20.1.0",
 		"@commitlint/config-conventional": "^20.0.0",
 		"@sapphire/eslint-config": "^5.0.6",
 		"@sapphire/prettier-config": "^2.0.0",
-		"@sapphire/ts-config": "^5.0.2",
-		"@swc/core": "^1.15.3",
+		"@sapphire/ts-config": "^5.0.3",
 		"@types/figlet": "^1.7.0",
 		"@types/gradient-string": "^1.1.6",
 		"@types/node": "^24.10.1",
+		"@types/pg": "^8.15.6",
 		"@types/ws": "^8.18.1",
 		"@typescript-eslint/eslint-plugin": "^7.18.0",
 		"@typescript-eslint/parser": "^7.18.0",
@@ -62,18 +62,10 @@
 		"lint-staged": "^16.2.7",
 		"prettier": "^3.7.1",
 		"prettier-plugin-prisma": "^5.0.0",
-		"prisma": "^6.19.0",
+		"prisma": "^7.0.1",
 		"rimraf": "^6.1.2",
-		"tsup": "^8.5.1",
-		"typescript": "~5.4.5"
-	},
-	"engines": {
-		"node": ">=16.6.0",
-		"npm": ">=7.24.2"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/sapphiredev/gemboard.git"
+		"tsdown": "^0.16.8",
+		"typescript": "~5.9.3"
 	},
 	"commitlint": {
 		"extends": [
@@ -81,7 +73,10 @@
 		]
 	},
 	"eslintConfig": {
-		"extends": "@sapphire"
+		"extends": "@sapphire",
+		"rules": {
+			"@typescript-eslint/unbound-method": "off"
+		}
 	},
 	"lint-staged": {
 		"*": "prettier --ignore-unknown --write",
@@ -93,8 +88,5 @@
 		}
 	},
 	"prettier": "@sapphire/prettier-config",
-	"packageManager": "yarn@4.12.0",
-	"volta": {
-		"node": "24.11.1"
-	}
+	"packageManager": "yarn@4.12.0"
 }
