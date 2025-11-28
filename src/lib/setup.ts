@@ -2,12 +2,18 @@
 import '#root/config';
 import '@sapphire/plugin-logger/register';
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '#lib/generated/prisma-client/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { ApplicationCommandRegistries, container, RegisterBehavior } from '@sapphire/framework';
+import { envParseString } from '@skyra/env-utilities';
 import * as colorette from 'colorette';
 import { inspect } from 'util';
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({
+	connectionString: envParseString('DATABASE_URL')
+});
+
+const prisma = new PrismaClient({ adapter });
 
 inspect.defaultOptions.depth = 1;
 colorette.createColors({ useColor: true });
