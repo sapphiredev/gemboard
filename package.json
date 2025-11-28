@@ -35,7 +35,7 @@
 		"@skyra/start-banner": "^2.0.2",
 		"bufferutil": "^4.0.9",
 		"colorette": "^2.0.20",
-		"discord.js": "^14.24.2",
+		"discord.js": "^14.25.1",
 		"figlet": "^1.9.4",
 		"gradient-string": "^3.0.0",
 		"utf-8-validate": "^6.0.5",
@@ -47,8 +47,8 @@
 		"@commitlint/config-conventional": "^20.0.0",
 		"@sapphire/eslint-config": "^5.0.6",
 		"@sapphire/prettier-config": "^2.0.0",
-		"@sapphire/ts-config": "^5.0.1",
-		"@swc/core": "^1.15.2",
+		"@sapphire/ts-config": "^5.0.2",
+		"@swc/core": "^1.15.3",
 		"@types/figlet": "^1.7.0",
 		"@types/gradient-string": "^1.1.6",
 		"@types/node": "^24.10.1",
@@ -59,11 +59,11 @@
 		"eslint": "^8.57.1",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-prettier": "^5.5.4",
-		"lint-staged": "^16.2.6",
-		"prettier": "^3.6.2",
+		"lint-staged": "^16.2.7",
+		"prettier": "^3.7.1",
 		"prettier-plugin-prisma": "^5.0.0",
 		"prisma": "^6.19.0",
-		"rimraf": "^6.1.0",
+		"rimraf": "^6.1.2",
 		"tsup": "^8.5.1",
 		"typescript": "~5.4.5"
 	},
@@ -93,7 +93,7 @@
 		}
 	},
 	"prettier": "@sapphire/prettier-config",
-	"packageManager": "yarn@4.11.0",
+	"packageManager": "yarn@4.12.0",
 	"volta": {
 		"node": "24.11.1"
 	}
