@@ -25,8 +25,8 @@ services:
     depends_on:
       - postgres
     env_file:
-      - ../src/.env
-      - ../src/.env.development.local
+      - ./src/.env
+      - ./src/.env.development.local
     image: gemboard:latest
     logging:
       options:
