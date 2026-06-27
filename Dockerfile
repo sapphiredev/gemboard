@@ -26,7 +26,6 @@ ENV NODE_ENV="development"
 
 COPY --chown=node:node tsconfig.base.json tsconfig.base.json
 COPY --chown=node:node tsdown.config.ts .
-COPY --chown=node:node playwright.config.ts .
 COPY --chown=node:node prisma.config.ts .
 COPY --chown=node:node .env .env
 COPY --chown=node:node prisma/ prisma/
