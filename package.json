@@ -50,7 +50,7 @@
 		"@sapphire/ts-config": "^5.0.3",
 		"@types/figlet": "^1.7.0",
 		"@types/gradient-string": "^1.1.6",
-		"@types/node": "^24.10.1",
+		"@types/node": "^26.6.6",
 		"@types/pg": "^8.15.6",
 		"@types/ws": "^8.18.1",
 		"@typescript-eslint/eslint-plugin": "^7.18.0",
@@ -90,6 +90,6 @@
 	"prettier": "@sapphire/prettier-config",
 	"packageManager": "yarn@4.12.0",
 	"volta": {
-		"node": "24.18.0"
+		"node": "26.13.1"
 	}
 }
